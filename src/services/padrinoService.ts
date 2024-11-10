@@ -12,6 +12,7 @@ export const getPadrinos = async (): Promise<Padrino[]> => {
             Authorization: `Bearer ${token}`
         }
     });
+    console.log(response.data);
     return response.data;
 };
 

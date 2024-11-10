@@ -14,6 +14,7 @@ const config: Config = {
         bgAmarillo: "#eec200",
         textGray: "#6b7280",
         textBlack: "#000000",
+        hoverTable: "#f6faff",
       },
     },
   },

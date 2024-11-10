@@ -106,7 +106,7 @@ const NavBar: React.FC = () => {
 
     return (
         <div className="relative">
-            <div className="bg-gray-800 text-white px-4 py-3 flex justify-between items-center">
+            <div className="bg-bgAzul text-white px-4 py-3 flex justify-between items-center">
                 <h1 className="text-xl font-semibold">Mi Aplicación</h1>
 
                 {/* Ítems de navegación */}
