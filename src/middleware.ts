@@ -14,5 +14,5 @@ export function middleware(request: NextRequest) {
 
 // Configuración para que el middleware solo aplique en las rutas que necesitan protección
 export const config = {
-    matcher: ['/home/:path*'], // Protege "/home" y todas sus subrutas
+    matcher: ['/home/:path*', '/padrinos/:path*'],
 };
