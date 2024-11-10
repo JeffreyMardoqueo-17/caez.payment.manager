@@ -11,7 +11,7 @@ export interface Padrino {
     RegistrationDate: string; // Fecha de registro como string
 }
 
-// Interfaz para crear un nuevo Padrino
+// Interfaz para crear un nuevo Padrino o actualizarlo
 export interface PadrinoCreate {
     Nombre: string;
     Apellido: string;

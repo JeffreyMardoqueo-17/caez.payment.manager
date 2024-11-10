@@ -4,21 +4,20 @@ import React, { useEffect, useState } from 'react';
 import TableList from '@/components/TableList';
 import Loader from '@/components/Loader';
 import Modal from '@/components/modals/Modal';
+import DeleteModal from '@/components/modals/DeleteModal';
 import CreatePadrinoForm from '@/components/Padrino/CreatePadrinoForm';
+import EditPadrinoForm from '@/components/Padrino/EditPadrinoForm';
+import MostrarInfo from '@/components/MostrarInfo';
 import { getPadrinos, updatePadrino, deletePadrino } from '@/services/padrinoService';
-import { Padrino } from '@/interfaces/Padrino';
-
-const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getFullYear()).slice(-2)}`;
-};
+import { Padrino, PadrinoCreate } from '@/interfaces/Padrino';
+import { formatDate } from '@/utils/formatDate';
 
 const PadrinoListPage = () => {
-    const [padrinos, setPadrinos] = useState<Array<Partial<Padrino>>>([]);
+    const [padrinos, setPadrinos] = useState<Array<Padrino>>([]);
     const [loading, setLoading] = useState(true);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [selectedPadrino, setSelectedPadrino] = useState<Padrino | null>(null);
-    const [modalType, setModalType] = useState<'view' | 'edit' | null>(null);
+    const [selectedPadrino, setSelectedPadrino] = useState<(Padrino & { IdRole: number }) | null>(null);
+    const [modalType, setModalType] = useState<'view' | 'edit' | 'delete' | null>(null);
 
     const headers = ["Nombre", "Apellido", "Correo", "Fecha de Registro"];
 
@@ -26,13 +25,7 @@ const PadrinoListPage = () => {
         setLoading(true);
         try {
             const data: Padrino[] = await getPadrinos();
-            const transformedData = data.map(({ Nombre, Apellido, Correo, RegistrationDate }) => ({
-                Nombre,
-                Apellido,
-                Correo,
-                "Fecha de Registro": formatDate(RegistrationDate),
-            }));
-            setPadrinos(transformedData);
+            setPadrinos(data);
         } catch (error) {
             console.error('Error fetching padrinos:', error);
         } finally {
@@ -45,36 +38,40 @@ const PadrinoListPage = () => {
     }, []);
 
     const handleActionClick = (row: Partial<Padrino>, action: string) => {
-        const fullPadrino = padrinos.find(p => p.Nombre === row.Nombre && p.Apellido === row.Apellido) as Padrino;
+        const fullPadrino = padrinos.find(p => p.Id === row.Id) as Padrino & { IdRole: number };
         setSelectedPadrino(fullPadrino);
+
         if (action === 'view') {
             setModalType('view');
         } else if (action === 'edit') {
             setModalType('edit');
         } else if (action === 'delete') {
-            handleDeletePadrino(fullPadrino.Id);
+            setModalType('delete');
         }
     };
 
-    const handleUpdatePadrino = async (updatedData: Partial<Padrino>) => {
+    const handleUpdatePadrino = async (updatedData: Partial<PadrinoCreate>) => {
         if (selectedPadrino) {
             try {
                 await updatePadrino(selectedPadrino.Id, updatedData);
                 alert("Padrino actualizado exitosamente");
-                fetchPadrinos(); // Refresca la lista después de actualizar
+                fetchPadrinos();
                 setModalType(null); // Cierra el modal de edición
+                setSelectedPadrino(null); // Limpia el padrino seleccionado
             } catch (error) {
                 console.error("Error actualizando el padrino:", error);
             }
         }
     };
 
-    const handleDeletePadrino = async (id: number) => {
-        if (confirm("¿Estás seguro de que deseas eliminar este padrino?")) {
+    const handleDeletePadrino = async () => {
+        if (selectedPadrino) {
             try {
-                await deletePadrino(id);
-                alert("Padrino eliminado exitosamente");
-                fetchPadrinos(); // Refresca la lista después de eliminar
+                await deletePadrino(selectedPadrino.Id);
+                alert(`Padrino ${selectedPadrino.Nombre} eliminado exitosamente`);
+                fetchPadrinos();
+                setModalType(null);
+                setSelectedPadrino(null);
             } catch (error) {
                 console.error("Error al eliminar el padrino:", error);
             }
@@ -106,8 +103,14 @@ const PadrinoListPage = () => {
             ) : (
                 <TableList
                     headers={headers}
-                    data={padrinos}
-                    onActionClick={handleActionClick} // Pasamos la función handleActionClick
+                    data={padrinos.map(({ Id, Nombre, Apellido, Correo, RegistrationDate }) => ({
+                        Id,
+                        Nombre,
+                        Apellido,
+                        Correo,
+                        "Fecha de Registro": formatDate(RegistrationDate)
+                    }))}
+                    onActionClick={handleActionClick}
                     initialRowsPerPage={10}
                     rowsPerPageOptions={[10, 25, 50, 100]}
                 />
@@ -128,34 +131,53 @@ const PadrinoListPage = () => {
             </Modal>
 
             {/* Modal para ver o editar detalles del padrino */}
-            {selectedPadrino && modalType && (
+            {selectedPadrino && modalType === 'view' && (
                 <Modal
-                    isOpen={!!selectedPadrino}
-                    title={modalType === 'view' ? "Detalles del Padrino" : "Editar Padrino"}
+                    isOpen={true}
+                    title="Detalles del Padrino"
                     onClose={() => {
                         setSelectedPadrino(null);
                         setModalType(null);
                     }}
                 >
-                    {modalType === 'view' ? (
-                        <div>
-                            <p><strong>ID:</strong> {selectedPadrino.Id}</p>
-                            <p><strong>Nombre:</strong> {selectedPadrino.Nombre}</p>
-                            <p><strong>Apellido:</strong> {selectedPadrino.Apellido}</p>
-                            <p><strong>Teléfono:</strong> {selectedPadrino.Telefono}</p>
-                            <p><strong>Correo:</strong> {selectedPadrino.Correo}</p>
-                            <p><strong>Rol:</strong> {selectedPadrino.RoleName}</p>
-                            <p><strong>Admin Name:</strong> {selectedPadrino.AdminName}</p>
-                            <p><strong>Admin Last Name:</strong> {selectedPadrino.AdminLastName}</p>
-                            <p><strong>Fecha de Registro:</strong> {formatDate(selectedPadrino.RegistrationDate)}</p>
-                        </div>
-                    ) : (
-                        <div>
-                            {/* Aquí iría el formulario de edición */}
-                            <p>Formulario para editar al padrino.</p>
-                        </div>
-                    )}
+                    <MostrarInfo data={selectedPadrino} />
                 </Modal>
+            )}
+
+            {/* Modal para editar el padrino */}
+            {selectedPadrino && modalType === 'edit' && (
+                <Modal
+                    isOpen={true}
+                    title="Editar Padrino"
+                    onClose={() => {
+                        setSelectedPadrino(null);
+                        setModalType(null);
+                    }}
+                >
+                    <EditPadrinoForm
+                        padrino={selectedPadrino}
+                        onSaveSuccess={() => {
+                            fetchPadrinos();
+                            setSelectedPadrino(null);
+                            setModalType(null);
+                        }}
+                        onCancel={() => {
+                            setSelectedPadrino(null);
+                            setModalType(null);
+                        }}
+                    />
+                </Modal>
+            )}
+
+            {/* Modal de confirmación de eliminación */}
+            {selectedPadrino && modalType === 'delete' && (
+                <DeleteModal
+                    isOpen={true}
+                    title="Eliminar Padrino"
+                    message={`¿Estás seguro de que deseas eliminar al padrino "${selectedPadrino.Nombre}"? Esta acción no se puede deshacer.`}
+                    onClose={() => setModalType(null)}
+                    onConfirm={handleDeletePadrino}
+                />
             )}
         </div>
     );

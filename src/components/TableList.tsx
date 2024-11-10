@@ -19,14 +19,26 @@ const TableList: React.FC<TableListProps> = ({
 }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(initialRowsPerPage);
-    const [sortedData, setSortedData] = useState(data);
-    const [filteredData, setFilteredData] = useState(data);
+    const [sortedData, setSortedData] = useState([...data].reverse()); // Mostrar último registro al principio
+    const [filteredData, setFilteredData] = useState([...data].reverse()); // Invertir los datos al inicio
     const [searchQuery, setSearchQuery] = useState('');
-    const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
+    const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>({ key: headers[0], direction: 'desc' });
+
+    // Guardar y recuperar configuración de orden en localStorage
+    useEffect(() => {
+        const storedSortConfig = localStorage.getItem('tableSortConfig');
+        if (storedSortConfig) {
+            const parsedConfig = JSON.parse(storedSortConfig);
+            if (parsedConfig && parsedConfig.key && parsedConfig.direction) {
+                setSortConfig(parsedConfig);
+                handleSort(parsedConfig.key, parsedConfig.direction, data);
+            }
+        }
+    }, [data]);
 
     useEffect(() => {
-        setSortedData(data);
-        setFilteredData(data);
+        setSortedData([...data].reverse()); // Invertir para mostrar el más reciente primero
+        setFilteredData([...data].reverse());
     }, [data]);
 
     useEffect(() => {
@@ -47,8 +59,9 @@ const TableList: React.FC<TableListProps> = ({
         setCurrentPage(page);
     };
 
-    const handleSort = (key: string, direction: 'asc' | 'desc') => {
-        const sortedArray = [...filteredData].sort((a, b) => {
+    const handleSort = (key: string, direction: 'asc' | 'desc', customData?: Record<string, any>[]) => {
+        const dataToSort = customData || filteredData;
+        const sortedArray = [...dataToSort].sort((a, b) => {
             if (a[key] < b[key]) return direction === 'asc' ? -1 : 1;
             if (a[key] > b[key]) return direction === 'asc' ? 1 : -1;
             return 0;
@@ -58,6 +71,9 @@ const TableList: React.FC<TableListProps> = ({
         setFilteredData(sortedArray);
         setSortConfig({ key, direction });
         setCurrentPage(1);
+
+        // Guardar la configuración de orden en localStorage
+        localStorage.setItem('tableSortConfig', JSON.stringify({ key, direction }));
     };
 
     const toggleSortOrder = () => {
@@ -66,7 +82,6 @@ const TableList: React.FC<TableListProps> = ({
         handleSort(sortKey, newDirection);
     };
 
-    // Filtrado de datos según el texto de búsqueda
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         const query = event.target.value.toLowerCase();
         setSearchQuery(query);
@@ -84,7 +99,6 @@ const TableList: React.FC<TableListProps> = ({
     return (
         <div className="flex flex-col p-1 bg-white rounded-lg shadow-sm">
             <div className="flex items-center justify-between mb-4 space-x-2">
-                {/* Botón para alternar el orden */}
                 <button
                     onClick={toggleSortOrder}
                     className="flex items-center space-x-2 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors duration-200"
@@ -93,7 +107,6 @@ const TableList: React.FC<TableListProps> = ({
                     <span>{sortConfig?.direction === 'asc' ? 'Orden Descendente' : 'Orden Ascendente'}</span>
                 </button>
 
-                {/* Campo de búsqueda */}
                 <div className="flex items-center bg-gray-100 rounded-lg px-2">
                     <FaSearch className="text-gray-500 mr-2" />
                     <input
@@ -156,7 +169,6 @@ const TableList: React.FC<TableListProps> = ({
                                         <FaTrashAlt />
                                     </button>
                                 </td>
-
                             </tr>
                         ))}
                     </tbody>

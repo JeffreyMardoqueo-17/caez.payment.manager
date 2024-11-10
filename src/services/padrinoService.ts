@@ -24,8 +24,13 @@ export const createPadrino = async (padrinoData: PadrinoCreate): Promise<void> =
     });
 };
 
-// Servicio para actualizar un padrino
+
 export const updatePadrino = async (id: number, padrinoData: Partial<PadrinoCreate>): Promise<void> => {
+    const token = Cookies.get('token');
+    if (!token) {
+        throw new Error("No se encontró el token de autenticación");
+    }
+
     await axios.put(`${API_URL}/padrinos/${id}`, padrinoData, {
         headers: {
             Authorization: `Bearer ${token}`,
@@ -33,7 +38,6 @@ export const updatePadrino = async (id: number, padrinoData: Partial<PadrinoCrea
         }
     });
 };
-
 // Servicio para eliminar un padrino
 export const deletePadrino = async (id: number): Promise<void> => {
     await axios.delete(`${API_URL}/padrinos/${id}`, {
