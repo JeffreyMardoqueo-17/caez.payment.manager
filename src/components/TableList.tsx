@@ -156,6 +156,7 @@ const TableList: React.FC<TableListProps> = ({
                                         <FaTrashAlt />
                                     </button>
                                 </td>
+
                             </tr>
                         ))}
                     </tbody>
