@@ -97,7 +97,7 @@ const TableList: React.FC<TableListProps> = ({
     };
 
     return (
-        <div className="flex flex-col p-1 bg-white rounded-lg shadow-sm">
+        <div className="flex flex-col p-1 bg-white rounded-lg shadow-sm ">
             <div className="flex items-center justify-between mb-4 space-x-2">
                 <button
                     onClick={toggleSortOrder}
@@ -120,7 +120,7 @@ const TableList: React.FC<TableListProps> = ({
             </div>
 
             <div className="overflow-x-auto overflow-y-hidden rounded-t-lg">
-                <table className="min-w-full border-collapse table-fixed">
+                <table className="min-w-full border-collapse table-fixed shadow-lg">
                     <thead className="sticky top-0 bg-background">
                         <tr>
                             {headers.map((header, index) => (
