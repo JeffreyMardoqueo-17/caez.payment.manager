@@ -7,7 +7,7 @@ import Modal from '@/components/modals/Modal';
 import DeleteModal from '@/components/modals/DeleteModal';
 import CreatePadrinoForm from '@/components/Padrino/CreatePadrinoForm';
 import EditPadrinoForm from '@/components/Padrino/EditPadrinoForm';
-import MostrarInfo from '@/components/MostrarInfo';
+import MostrarInfo from '@/components/Tables/MostrarInfo';
 import { getPadrinos, updatePadrino, deletePadrino } from '@/services/padrinoService';
 import { Padrino, PadrinoCreate } from '@/interfaces/Padrino';
 import { formatDate } from '@/utils/formatDate';

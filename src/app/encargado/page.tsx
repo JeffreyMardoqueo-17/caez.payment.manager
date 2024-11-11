@@ -7,7 +7,7 @@ import DeleteModal from '@/components/modals/DeleteModal';
 // import CreateEncargadoForm from '@/components/encargado/CreateEncargadoForm';
 import CreateEncargadoForm from '@/components/encargado/CreateEncargadoFrom';
 import EditEncargadoForm from '@/components/encargado/EditEncargadoForm';
-import MostrarInfo from '@/components/MostrarInfo';
+import MostrarInfo from '@/components/Tables/MostrarInfo';
 import { getEncargados, updateEncargado, deleteEncargado } from '@/services/EncargadoService';
 import { Encargado, EncargadoCreate } from '@/interfaces/Encargado';
 import { formatDate } from '@/utils/formatDate';
