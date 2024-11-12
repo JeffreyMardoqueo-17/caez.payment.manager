@@ -1,7 +1,7 @@
 // src/app/padrino/PadrinoListPage.tsx
 "use client";
 import React, { useEffect, useState } from 'react';
-import TableList from '@/components/TableList';
+import TableList from '@/components/Tables/TableList';
 import Loader from '@/components/Loader';
 import Modal from '@/components/modals/Modal';
 import DeleteModal from '@/components/modals/DeleteModal';
