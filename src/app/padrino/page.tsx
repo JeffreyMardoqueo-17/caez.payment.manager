@@ -1,13 +1,13 @@
 // src/app/padrino/PadrinoListPage.tsx
 "use client";
 import React, { useEffect, useState } from 'react';
-import TableList from '@/components/TableList';
+import TableList from '@/components/Tables/TableList';
 import Loader from '@/components/Loader';
 import Modal from '@/components/modals/Modal';
 import DeleteModal from '@/components/modals/DeleteModal';
 import CreatePadrinoForm from '@/components/Padrino/CreatePadrinoForm';
 import EditPadrinoForm from '@/components/Padrino/EditPadrinoForm';
-import MostrarInfo from '@/components/Tables/MostrarInfo';
+import MostrarInfo from '@/components/MostrarInfo';
 import { getPadrinos, updatePadrino, deletePadrino } from '@/services/padrinoService';
 import { Padrino, PadrinoCreate } from '@/interfaces/Padrino';
 import { formatDate } from '@/utils/formatDate';

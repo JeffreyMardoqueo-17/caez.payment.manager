@@ -1,13 +1,13 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import TableList from '@/components/TableList';
+import TableList from '@/components/Tables/TableList';
 import Loader from '@/components/Loader';
 import Modal from '@/components/modals/Modal';
 import DeleteModal from '@/components/modals/DeleteModal';
 // import CreateEncargadoForm from '@/components/encargado/CreateEncargadoForm';
 import CreateEncargadoForm from '@/components/encargado/CreateEncargadoFrom';
 import EditEncargadoForm from '@/components/encargado/EditEncargadoForm';
-import MostrarInfo from '@/components/Tables/MostrarInfo';
+import MostrarInfo from '@/components/MostrarInfo';
 import { getEncargados, updateEncargado, deleteEncargado } from '@/services/EncargadoService';
 import { Encargado, EncargadoCreate } from '@/interfaces/Encargado';
 import { formatDate } from '@/utils/formatDate';

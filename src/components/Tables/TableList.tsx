@@ -149,7 +149,7 @@ const TableList: React.FC<TableListProps> = ({
                                 <td className="px-4 py-2 text-center flex items-center justify-center space-x-2">
                                     <button
                                         onClick={() => onActionClick && onActionClick(row, 'view')}
-                                        className="p-2 rounded-full text-white bg-bgAzul hover:bg-blue-950 transition-colors duration-200"
+                                        className="p-2 bg-bgAzul rounded-full text-blue-100 hover:bg-blue-200 transition duration-200"
                                         aria-label="View"
                                     >
                                         <FaEye />
