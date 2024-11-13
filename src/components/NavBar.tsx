@@ -6,9 +6,9 @@ import { FaCaretDown, FaBell, FaBars } from "react-icons/fa";
 import Cookies from "js-cookie";
 
 interface User {
-    Id: number;
-    Name: string;
-    LastName: string;
+    id: number;
+    name: string;
+    lastName: string;
 }
 
 const NavBar: React.FC<{ onSidebarToggle: () => void }> = ({ onSidebarToggle }) => {
@@ -22,16 +22,17 @@ const NavBar: React.FC<{ onSidebarToggle: () => void }> = ({ onSidebarToggle }) 
 
     // Cargar usuario de cookies
     useEffect(() => {
+        // Obtener la información del usuario desde las cookies
         const storedUser = Cookies.get("user");
-        if (storedUser) {
-            try {
-                const parsedUser = JSON.parse(decodeURIComponent(storedUser));
-                setUser(parsedUser);
-            } catch (error) {
-                console.error("Error parsing user from cookies:", error);
-            }
+        const token = Cookies.get("token");
+
+        if (!token || !storedUser) {
+            // Si no hay token o usuario, redirigir a la página de inicio de sesión
+            router.push("/");
+        } else {
+            setUser(JSON.parse(decodeURIComponent(storedUser)));
         }
-    }, []);
+    }, [router]);
 
     const handleLogout = () => {
         Cookies.remove("token");
@@ -57,7 +58,7 @@ const NavBar: React.FC<{ onSidebarToggle: () => void }> = ({ onSidebarToggle }) 
                             onClick={() => setShowUserDropdown(!showUserDropdown)}
                             className="text-gray-700 font-medium flex items-center"
                         >
-                            {user.Name} {user.LastName} <FaCaretDown className="ml-2" />
+                            {user.name} {user.lastName} <FaCaretDown className="ml-2" />
                         </button>
                         {showUserDropdown && (
                             <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg">

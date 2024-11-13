@@ -24,7 +24,7 @@
 ]
  */
 export interface AlumnoGet {
-  id: number;
+  Id: number;
   Nombre: string;
   Apellido: string;
   FechaNacimiento: string;

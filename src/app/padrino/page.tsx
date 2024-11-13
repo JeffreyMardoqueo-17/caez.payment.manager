@@ -81,7 +81,7 @@ const PadrinoListPage = () => {
     const closeCreateModal = () => setIsCreateModalOpen(false);
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="mx-auto p-1">
             <h1 className="text-2xl font-bold mb-4">Lista de Padrinos</h1>
 
             <button

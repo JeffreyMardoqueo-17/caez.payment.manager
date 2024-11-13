@@ -113,14 +113,17 @@ const AuditoriaEncargadoList: React.FC = () => {
     };
 
     return (
-        <div className="container mx-auto p-6">
-            <h1 className="text-3xl font-bold mb-6 text-center">Auditoría de Encargados</h1>
-            {/* ... (rango de fechas, manejo de errores y datos) */}
-
+        <div className="mx-auto p-1">
+            <h1 className="text-3xl font-bold mb-1 text-center">Auditoría de Encargados</h1>
             {loading ? (
                 <Loader />
             ) : (
-                <TablaAuditoria data={auditoria} onOpenDetails={openModal} />
+                <TablaAuditoria 
+                    data={auditoria} 
+                    onOpenDetails={openModal} 
+                    onFilterByDate={handleFilterByDate} 
+                    onFetchAll={fetchAllAuditoria} 
+                />
             )}
 
             {isModalOpen && selectedDetails && (

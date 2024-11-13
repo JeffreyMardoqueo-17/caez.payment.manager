@@ -5,7 +5,7 @@ import Loader from '@/components/Loader';
 import Modal from '@/components/modals/Modal';
 import DeleteModal from '@/components/modals/DeleteModal';
 import CreateAlumnoForm from '@/components/Alumno/CreateAlumnoForm';
-// import EditAlumnoForm from '@/components/Alumno/EditAlumnoForm';
+import EditAlumnoForm from '@/components/Alumno/EditAlumnoForm';
 import MostrarInfo from '@/components/MostrarInfo';
 import { getAlumnos, updateAlumno, deleteAlumno } from '@/services/AlumnoService';
 import { AlumnoGet, AlumnoPost } from '@/interfaces/Alumno';
@@ -36,23 +36,39 @@ const AlumnoListPage = () => {
         fetchAlumnos();
     }, []);
 
-    const handleActionClick = (row: Partial<AlumnoGet>, action: string) => {
-        const fullAlumno = alumnos.find(a => a.id === row.id) as AlumnoGet;
-        setSelectedAlumno(fullAlumno);
+    // Mapeo de AlumnoGet a AlumnoPost
+    const mapAlumnoGetToPost = (alumno: AlumnoGet): AlumnoPost => {
+        return {
+            Nombre: alumno.Nombre,
+            Apellido: alumno.Apellido,
+            FechaNacimiento: alumno.FechaNacimiento,
+            IdSexo: parseInt(alumno.Sexo) || 0, // Conversión para que coincida con el ID de sexo
+            IdRole: 2, // Asignar siempre el rol de estudiante
+            IdGrado: parseInt(alumno.Grado) || 0,
+            IdTurno: 1, // Asumimos un valor de turno predeterminado, ajusta si es necesario
+            IdEncargado: 1, // Id de un encargado predeterminado, cambia si tienes uno específico
+            IdTipoDocumento: 2, // Tipo de documento predeterminado "NIE"
+            NumDocumento: alumno.NumDocumento,
+            EsBecado: alumno.EsBecado,
+            IdPadrino: alumno.PadrinoNombre ? 1 : null, // Condición para asignar o no un padrino
+        };
+    };
 
-        if (action === 'view') {
-            setModalType('view');
-        } else if (action === 'edit') {
-            setModalType('edit');
-        } else if (action === 'delete') {
-            setModalType('delete');
+    const handleActionClick = (row: Record<string, any>, action: 'view' | 'edit' | 'delete') => {
+        const fullAlumno = alumnos.find(a => a.Id === row.Id);
+        if (!fullAlumno) {
+            console.error("No se encontró el alumno con ID:", row.Id);
+            return;
         }
+
+        setSelectedAlumno(fullAlumno);
+        setModalType(action);
     };
 
     const handleUpdateAlumno = async (updatedData: Partial<AlumnoPost>) => {
         if (selectedAlumno) {
             try {
-                await updateAlumno(selectedAlumno.id, updatedData);
+                await updateAlumno(selectedAlumno.Id, updatedData);
                 alert("Alumno actualizado exitosamente");
                 fetchAlumnos();
                 setModalType(null);
@@ -66,12 +82,14 @@ const AlumnoListPage = () => {
     const handleDeleteAlumno = async () => {
         if (selectedAlumno) {
             try {
-                await deleteAlumno(selectedAlumno.id);
+                await deleteAlumno(selectedAlumno.Id);
                 fetchAlumnos();
                 setModalType(null);
                 setSelectedAlumno(null);
-            } catch (error) {
+                alert("Alumno eliminado exitosamente");
+            } catch (error: any) {
                 console.error("Error al eliminar el alumno:", error);
+                alert(`Ocurrió un error al eliminar el alumno: ${error.message}`);
             }
         }
     };
@@ -79,7 +97,7 @@ const AlumnoListPage = () => {
     const closeCreateModal = () => setIsCreateModalOpen(false);
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="mx-auto p-1">
             <h1 className="text-2xl font-bold mb-4">Lista de Alumnos</h1>
 
             <button
@@ -101,15 +119,15 @@ const AlumnoListPage = () => {
             ) : (
                 <TableList
                     headers={headers}
-                    data={alumnos.map(({ id, Nombre, Apellido, Sexo, Grado, RegistrationDate }) => ({
-                        id,
+                    data={alumnos.map(({ Id, Nombre, Apellido, Sexo, Grado, RegistrationDate }) => ({
+                        Id,
                         Nombre,
                         Apellido,
                         Sexo,
                         Grado,
                         "Fecha de Registro": formatDate(RegistrationDate)
                     }))}
-                    onActionClick={handleActionClick}
+                    onActionClick={(row, action) => handleActionClick(row, action as 'view' | 'edit' | 'delete')}
                     initialRowsPerPage={10}
                     rowsPerPageOptions={[10, 25, 50, 100]}
                 />
@@ -129,7 +147,7 @@ const AlumnoListPage = () => {
                 />
             </Modal>
 
-            {/* Modal para ver o editar detalles del alumno */}
+            {/* Modal para ver detalles del alumno */}
             {selectedAlumno && modalType === 'view' && (
                 <Modal
                     isOpen={true}
@@ -145,7 +163,28 @@ const AlumnoListPage = () => {
 
             {/* Modal para editar el alumno */}
             {selectedAlumno && modalType === 'edit' && (
-                <h1>Hola editado</h1>
+                <Modal
+                    isOpen={true}
+                    title="Editar Alumno"
+                    onClose={() => {
+                        setSelectedAlumno(null);
+                        setModalType(null);
+                    }}
+                >
+                    <EditAlumnoForm
+                        alumnoData={mapAlumnoGetToPost(selectedAlumno)}
+                        alumnoId={selectedAlumno.Id}
+                        onSaveSuccess={() => {
+                            fetchAlumnos();
+                            setModalType(null);
+                            setSelectedAlumno(null);
+                        }}
+                        onCancel={() => {
+                            setSelectedAlumno(null);
+                            setModalType(null);
+                        }}
+                    />
+                </Modal>
             )}
 
             {/* Modal de confirmación de eliminación */}
@@ -154,7 +193,10 @@ const AlumnoListPage = () => {
                     isOpen={true}
                     title="Eliminar Alumno"
                     message={`¿Estás seguro de que deseas eliminar al alumno "${selectedAlumno.Nombre}"? Esta acción no se puede deshacer.`}
-                    onClose={() => setModalType(null)}
+                    onClose={() => {
+                        setModalType(null);
+                        setSelectedAlumno(null);
+                    }}
                     onConfirm={handleDeleteAlumno}
                 />
             )}

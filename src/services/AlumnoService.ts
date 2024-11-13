@@ -65,10 +65,24 @@ export const updateAlumno = async (id: number, alumnoData: Partial<AlumnoPost>):
         }
     }
 };
-
 // Servicio para eliminar un alumno
 export const deleteAlumno = async (id: number): Promise<void> => {
-    await axios.delete(`${API_URL}/alumnos/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-    });
+    const token = Cookies.get('token');
+    if (!token) {
+        throw new Error("No se encontró el token de autenticación");
+    }
+
+    try {
+        await axios.delete(`${API_URL}/alumnos/${id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+    } catch (error: any) {
+        if (error.response) {
+            console.error('Error en la respuesta del servidor:', error.response.data);
+            throw new Error(error.response.data.msg || "Error desconocido al eliminar el alumno");
+        } else {
+            console.error('Error de conexión:', error.message);
+            throw new Error("Error al conectar con el servidor");
+        }
+    }
 };
