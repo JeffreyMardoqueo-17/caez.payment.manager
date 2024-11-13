@@ -5,12 +5,12 @@ import { getSexos, Sexo } from '@/services/SexoService';
 import { getGrados, Grado } from '@/services/GradoService';
 import { getTurnos, Turno } from '@/services/TurnoService';
 import { getEncargados } from '@/services/EncargadoService';
-import { getTipoDocumento } from '@/services/TipoDocumentoService';
 import { getPadrinos } from '@/services/padrinoService';
 import { Encargado } from '@/interfaces/Encargado';
 import { Padrino } from '@/interfaces/Padrino';
-import { TipoDocumento } from '@/interfaces/TipoDocumento';
 import { AlumnoPost } from '@/interfaces/Alumno';
+import { FaUserPlus } from 'react-icons/fa';
+
 interface CreateAlumnoFormProps {
     onCreateSuccess: () => void;
 }
@@ -21,14 +21,14 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
         Apellido: '',
         FechaNacimiento: '',
         IdSexo: 0,
-        IdRole: 2, // Role fijo para Estudiante
+        IdRole: 2, // Rol fijo para "Estudiante"
         IdGrado: 0,
         IdTurno: 0,
         IdEncargado: 0,
-        IdTipoDocumento: 0,
+        IdTipoDocumento: 2, // Tipo de Documento fijo para "NIE"
         NumDocumento: '',
         EsBecado: false,
-        IdPadrino: null // Asegúrate de que esto sea null inicialmente
+        IdPadrino: null
     });
 
     const [error, setError] = useState<string | null>(null);
@@ -36,19 +36,16 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
     const [grados, setGrados] = useState<Grado[]>([]);
     const [turnos, setTurnos] = useState<Turno[]>([]);
     const [encargados, setEncargados] = useState<Encargado[]>([]);
-    const [tiposDocumento, setTiposDocumento] = useState<TipoDocumento[]>([]);
     const [padrinos, setPadrinos] = useState<Padrino[]>([]);
 
-    // Cargar datos de los selectores y establecer valores iniciales
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [sexosData, gradosData, turnosData, encargadosData, tiposDocumentoData, padrinosData] = await Promise.all([
+                const [sexosData, gradosData, turnosData, encargadosData, padrinosData] = await Promise.all([
                     getSexos(),
                     getGrados(),
                     getTurnos(),
                     getEncargados(),
-                    getTipoDocumento(),
                     getPadrinos()
                 ]);
 
@@ -56,17 +53,14 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
                 setGrados(gradosData);
                 setTurnos(turnosData);
                 setEncargados(encargadosData);
-                setTiposDocumento(tiposDocumentoData);
                 setPadrinos(padrinosData);
 
-                // Establecer valores predeterminados válidos
                 setAlumnoData((prevData) => ({
                     ...prevData,
                     IdSexo: sexosData[0]?.Id || 0,
                     IdGrado: gradosData[0]?.Id || 0,
                     IdTurno: turnosData[0]?.Id || 0,
-                    IdEncargado: encargadosData[0]?.Id || 0,
-                    IdTipoDocumento: tiposDocumentoData[0]?.Id || 0,
+                    IdEncargado: encargadosData[0]?.Id || 0
                 }));
             } catch (error) {
                 console.error("Error al cargar datos de selectores:", error);
@@ -78,8 +72,6 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
-
-        // Verificamos si es un input de tipo checkbox
         const fieldValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
 
         setAlumnoData((prevData) => ({
@@ -104,7 +96,7 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
                 IdGrado: grados[0]?.Id || 0,
                 IdTurno: turnos[0]?.Id || 0,
                 IdEncargado: encargados[0]?.Id || 0,
-                IdTipoDocumento: tiposDocumento[0]?.Id || 0,
+                IdTipoDocumento: 2, // Fijo en "NIE"
                 NumDocumento: '',
                 EsBecado: false,
                 IdPadrino: null
@@ -117,7 +109,7 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
 
     return (
         <form onSubmit={handleSubmit} className="p-4 bg-white rounded-lg max-w-2xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label className="block text-gray-700">Nombre</label>
                     <input
@@ -219,19 +211,12 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
                 </div>
                 <div>
                     <label className="block text-gray-700">Tipo de Documento</label>
-                    <select
-                        name="IdTipoDocumento"
-                        value={alumnoData.IdTipoDocumento}
-                        onChange={handleChange}
-                        className="w-full p-2 border border-gray-300 rounded"
-                        required
-                    >
-                        {tiposDocumento.map((tipo) => (
-                            <option key={tipo.Id} value={tipo.Id}>
-                                {tipo.Nombre}
-                            </option>
-                        ))}
-                    </select>
+                    <input
+                        type="text"
+                        value="NIE"
+                        readOnly
+                        className="w-full p-2 border border-gray-300 rounded bg-gray-100 text-gray-500"
+                    />
                 </div>
                 <div>
                     <label className="block text-gray-700">Número de Documento</label>
@@ -245,7 +230,7 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
                         required
                     />
                 </div>
-                <div className="col-span-2">
+                <div className="col-span-3">
                     <label className="block text-gray-700">Becado</label>
                     <input
                         type="checkbox"
@@ -256,7 +241,7 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
                     />
                 </div>
                 {alumnoData.EsBecado && (
-                    <div>
+                    <div className="col-span-3">
                         <label className="block text-gray-700">Padrino</label>
                         <select
                             name="IdPadrino"
@@ -278,9 +263,13 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
 
             {error && <p className="text-red-500 mt-4">{error}</p>}
 
-            <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded-lg mt-6">
-                Crear Alumno
-            </button>
+            <div className="flex justify-center">
+                <button type="submit" className="flex items-center justify-center w-2/3 gap-2 bg-bgAzul text-white py-2 rounded-lg mt-6 ">
+                    <FaUserPlus className="text-lg" /> {/* Ajusta el tamaño del ícono si es necesario */}
+                    <span>Crear Alumno</span>
+                </button>
+            </div>
+
         </form>
     );
 };

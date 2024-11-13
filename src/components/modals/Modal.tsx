@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 
 interface ModalProps {
     isOpen: boolean;
@@ -9,25 +9,35 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, title, onClose, children }) => {
-    const modalRef = useRef<HTMLDivElement>(null); // Referencia al contenido del modal
+    const modalRef = useRef<HTMLDivElement>(null);
+    const [clickCount, setClickCount] = useState(0);
 
     if (!isOpen) return null;
 
-    // Función para manejar el clic fuera del contenido del modal
+    // Función para manejar el doble clic fuera del contenido del modal
     const handleOutsideClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-            onClose(); // Cierra el modal si se hace clic fuera de él
+            setClickCount((prev) => prev + 1); // Incrementa el conteo de clics
+
+            // Cierra el modal si el usuario hace doble clic en el fondo
+            if (clickCount + 1 === 2) {
+                onClose();
+                setClickCount(0); // Reinicia el contador
+            }
+
+            // Reinicia el contador de clics si el usuario no hace clic rápidamente
+            setTimeout(() => setClickCount(0), 300); // 300ms para reiniciar el conteo
         }
     };
 
     return (
         <div
             className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-2"
-            onClick={handleOutsideClick} // Llama a la función al hacer clic en el contenedor exterior
+            onClick={handleOutsideClick}
         >
             <div
-                ref={modalRef} // Aplica la referencia al contenido del modal
-                className="bg-white w-full max-w-md mx-auto rounded-lg shadow-lg overflow-hidden"
+                ref={modalRef}
+                className="bg-white w-full max-w-3xl mx-auto rounded-lg shadow-lg overflow-hidden" // max-w-3xl para ancho mayor
             >
                 <div className="bg-bgAzul px-6 py-4 flex items-center justify-between">
                     <h2 className="text-lg font-semibold text-white">{title}</h2>
