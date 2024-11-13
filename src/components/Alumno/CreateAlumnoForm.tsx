@@ -11,7 +11,6 @@ import { Encargado } from '@/interfaces/Encargado';
 import { Padrino } from '@/interfaces/Padrino';
 import { TipoDocumento } from '@/interfaces/TipoDocumento';
 import { AlumnoPost } from '@/interfaces/Alumno';
-
 interface CreateAlumnoFormProps {
     onCreateSuccess: () => void;
 }
@@ -29,7 +28,7 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
         IdTipoDocumento: 0,
         NumDocumento: '',
         EsBecado: false,
-        PadrinoNombre: null
+        IdPadrino: null // Asegúrate de que esto sea null inicialmente
     });
 
     const [error, setError] = useState<string | null>(null);
@@ -68,7 +67,6 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
                     IdTurno: turnosData[0]?.Id || 0,
                     IdEncargado: encargadosData[0]?.Id || 0,
                     IdTipoDocumento: tiposDocumentoData[0]?.Id || 0,
-                    PadrinoNombre: prevData.EsBecado ? (padrinosData[0]?.Id || null) : null
                 }));
             } catch (error) {
                 console.error("Error al cargar datos de selectores:", error);
@@ -79,13 +77,15 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value, type, checked } = e.target as HTMLInputElement;
-        const fieldValue = type === 'checkbox' ? checked : value;
+        const { name, value, type } = e.target;
+
+        // Verificamos si es un input de tipo checkbox
+        const fieldValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
 
         setAlumnoData((prevData) => ({
             ...prevData,
             [name]: fieldValue,
-            ...(name === 'EsBecado' && !checked ? { PadrinoNombre: null } : {})
+            ...(name === 'EsBecado' && !fieldValue ? { IdPadrino: null } : {})
         }));
     };
 
@@ -107,7 +107,7 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
                 IdTipoDocumento: tiposDocumento[0]?.Id || 0,
                 NumDocumento: '',
                 EsBecado: false,
-                PadrinoNombre: null
+                IdPadrino: null
             });
             onCreateSuccess();
         } catch (error: any) {
@@ -259,12 +259,13 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
                     <div>
                         <label className="block text-gray-700">Padrino</label>
                         <select
-                            name="PadrinoNombre"
-                            value={alumnoData.PadrinoNombre ?? ""}
+                            name="IdPadrino"
+                            value={alumnoData.IdPadrino ?? ""}
                             onChange={handleChange}
                             className="w-full p-2 border border-gray-300 rounded"
                             required
                         >
+                            <option value="">Seleccione un Padrino</option>
                             {padrinos.map((padrino) => (
                                 <option key={padrino.Id} value={padrino.Id}>
                                     {padrino.Nombre} {padrino.Apellido}

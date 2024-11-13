@@ -24,24 +24,24 @@
 ]
  */
 export interface AlumnoGet {
-    id: number;
-    Nombre: string;
-    Apellido: string;
-    FechaNacimiento: string;
-    Sexo: string;
-    RoleName: string;
-    Grado: string;
-    Turno: string;
-    EncargadoNombre: string;
-    EncargadoApellido: string;
-    TipoDocumento: string;
-    NumDocumento: string;
-    EsBecado: boolean;
-    PadrinoNombre: string | null;
-    PadrinoApellido: string | null;
-    AdminName: string;
-    AdminLastName: string;
-    RegistrationDate: string;
+  id: number;
+  Nombre: string;
+  Apellido: string;
+  FechaNacimiento: string;
+  Sexo: string;
+  RoleName: string;
+  Grado: string;
+  Turno: string;
+  EncargadoNombre: string;
+  EncargadoApellido: string;
+  TipoDocumento: string;
+  NumDocumento: string;
+  EsBecado: boolean;
+  PadrinoNombre: string | null;
+  PadrinoApellido: string | null;
+  AdminName: string;
+  AdminLastName: string;
+  RegistrationDate: string;
 }
 
 /**
@@ -62,16 +62,16 @@ export interface AlumnoGet {
 
  */
 export interface AlumnoPost {
-    Nombre: string;
-    Apellido: string;
-    FechaNacimiento: string;
-    IdSexo: number;
-    IdRole: number;
-    IdGrado: number;
-    IdTurno: number;
-    IdEncargado: number;
-    IdTipoDocumento: number;
-    NumDocumento: string;
-    EsBecado: boolean;
-    PadrinoNombre: number | null; //en caso de ser becaso se llena esto, si no se manda como nulo
+  Nombre: string;
+  Apellido: string;
+  FechaNacimiento: string;
+  IdSexo: number;
+  IdRole: number;
+  IdGrado: number;
+  IdTurno: number;
+  IdEncargado: number;
+  IdTipoDocumento: number;
+  NumDocumento: string;
+  EsBecado: boolean;
+  IdPadrino: number | null; //en caso de ser becaso se llena esto, si no se manda como nulo
 }
