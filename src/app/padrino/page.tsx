@@ -54,7 +54,7 @@ const PadrinoListPage = () => {
         if (selectedPadrino) {
             try {
                 await updatePadrino(selectedPadrino.Id, updatedData);
-                alert("Padrino actualizado exitosamente");
+                // alert("Padrino actualizado exitosamente");
                 fetchPadrinos();
                 setModalType(null); // Cierra el modal de edición
                 setSelectedPadrino(null); // Limpia el padrino seleccionado
@@ -68,7 +68,7 @@ const PadrinoListPage = () => {
         if (selectedPadrino) {
             try {
                 await deletePadrino(selectedPadrino.Id);
-                alert(`Padrino ${selectedPadrino.Nombre} eliminado exitosamente`);
+                // alert(`Padrino ${selectedPadrino.Nombre} eliminado exitosamente`);
                 fetchPadrinos();
                 setModalType(null);
                 setSelectedPadrino(null);

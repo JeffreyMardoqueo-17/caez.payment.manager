@@ -13,7 +13,6 @@ interface TablaAuditoriaProps {
     onFilterByDate: (startDate: string, endDate: string) => void;
     onFetchAll: () => void;
 }
-
 const getOperationStyle = (operation: string) => {
     switch (operation) {
         case 'INSERT':
