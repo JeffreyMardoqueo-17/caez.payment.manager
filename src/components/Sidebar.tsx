@@ -12,9 +12,9 @@ const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, o
     if (pathname === "/") return null;
 
     const menuItems = [
-        { label: "Dashboard", icon: <FaChartPie />, path: "/dashboard" },
-        { label: "Usuarios", icon: <FaUsers />, path: "/users" },
-        { label: "Ajustes", icon: <FaCog />, path: "/settings" },
+        { label: "alumno", icon: <FaChartPie />, path: "/alumno" },
+        { label: "padrino", icon: <FaUsers />, path: "/padrino" },
+        { label: "encargado", icon: <FaCog />, path: "/encargado" },
     ];
 
     const handleNavigation = (path: string) => {

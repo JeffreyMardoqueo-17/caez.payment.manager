@@ -1,20 +1,16 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import Cookies from 'js-cookie';
 import { createAlumno } from '@/services/AlumnoService';
-import { getSexos } from '@/services/SexoService';
-import { getGrados } from '@/services/GradoService';
-import { getTurnos } from '@/services/TurnoService';
+import { getSexos, Sexo } from '@/services/SexoService';
+import { getGrados, Grado } from '@/services/GradoService';
+import { getTurnos, Turno } from '@/services/TurnoService';
 import { getEncargados } from '@/services/EncargadoService';
 import { getTipoDocumento } from '@/services/TipoDocumentoService';
 import { getPadrinos } from '@/services/padrinoService';
-import { AlumnoPost } from '@/interfaces/Alumno';
-import { Sexo } from '@/services/SexoService';
-import { Grado } from '@/services/GradoService';
-import { Turno } from '@/services/TurnoService';
 import { Encargado } from '@/interfaces/Encargado';
-import { TipoDocumento } from '@/interfaces/TipoDocumento';
 import { Padrino } from '@/interfaces/Padrino';
+import { TipoDocumento } from '@/interfaces/TipoDocumento';
+import { AlumnoPost } from '@/interfaces/Alumno';
 
 interface CreateAlumnoFormProps {
     onCreateSuccess: () => void;
@@ -35,6 +31,7 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
         EsBecado: false,
         PadrinoNombre: null
     });
+
     const [error, setError] = useState<string | null>(null);
     const [sexos, setSexos] = useState<Sexo[]>([]);
     const [grados, setGrados] = useState<Grado[]>([]);
@@ -43,7 +40,7 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
     const [tiposDocumento, setTiposDocumento] = useState<TipoDocumento[]>([]);
     const [padrinos, setPadrinos] = useState<Padrino[]>([]);
 
-    // Cargar datos de los selectores
+    // Cargar datos de los selectores y establecer valores iniciales
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -55,14 +52,27 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
                     getTipoDocumento(),
                     getPadrinos()
                 ]);
+
                 setSexos(sexosData);
                 setGrados(gradosData);
                 setTurnos(turnosData);
                 setEncargados(encargadosData);
                 setTiposDocumento(tiposDocumentoData);
                 setPadrinos(padrinosData);
+
+                // Establecer valores predeterminados válidos
+                setAlumnoData((prevData) => ({
+                    ...prevData,
+                    IdSexo: sexosData[0]?.Id || 0,
+                    IdGrado: gradosData[0]?.Id || 0,
+                    IdTurno: turnosData[0]?.Id || 0,
+                    IdEncargado: encargadosData[0]?.Id || 0,
+                    IdTipoDocumento: tiposDocumentoData[0]?.Id || 0,
+                    PadrinoNombre: prevData.EsBecado ? (padrinosData[0]?.Id || null) : null
+                }));
             } catch (error) {
                 console.error("Error al cargar datos de selectores:", error);
+                setError("Error al cargar datos de los selectores.");
             }
         };
         fetchData();
@@ -72,7 +82,11 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
         const { name, value, type, checked } = e.target as HTMLInputElement;
         const fieldValue = type === 'checkbox' ? checked : value;
 
-        setAlumnoData({ ...alumnoData, [name]: fieldValue });
+        setAlumnoData((prevData) => ({
+            ...prevData,
+            [name]: fieldValue,
+            ...(name === 'EsBecado' && !checked ? { PadrinoNombre: null } : {})
+        }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -85,19 +99,19 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
                 Nombre: '',
                 Apellido: '',
                 FechaNacimiento: '',
-                IdSexo: 0,
+                IdSexo: sexos[0]?.Id || 0,
                 IdRole: 2,
-                IdGrado: 0,
-                IdTurno: 0,
-                IdEncargado: 0,
-                IdTipoDocumento: 0,
+                IdGrado: grados[0]?.Id || 0,
+                IdTurno: turnos[0]?.Id || 0,
+                IdEncargado: encargados[0]?.Id || 0,
+                IdTipoDocumento: tiposDocumento[0]?.Id || 0,
                 NumDocumento: '',
                 EsBecado: false,
                 PadrinoNombre: null
             });
             onCreateSuccess();
         } catch (error: any) {
-            setError(error.message);
+            setError(error.message || "Error al crear el alumno");
         }
     };
 
