@@ -18,7 +18,7 @@ const AlumnoListPage = () => {
     const [selectedAlumno, setSelectedAlumno] = useState<AlumnoGet | null>(null);
     const [modalType, setModalType] = useState<'view' | 'edit' | 'delete' | null>(null);
 
-    const headers = ["Nombre", "Apellido", "Sexo", "Grado", "Fecha de Registro"];
+    const headers = ["NIE", "Nombre", "Apellido", "Sexo", "Grado", "Fecha de Registro"];
 
     const fetchAlumnos = async () => {
         setLoading(true);
@@ -119,8 +119,8 @@ const AlumnoListPage = () => {
             ) : (
                 <TableList
                     headers={headers}
-                    data={alumnos.map(({ Id, Nombre, Apellido, Sexo, Grado, RegistrationDate }) => ({
-                        Id,
+                    data={alumnos.map(({ NumDocumento, Nombre, Apellido, Sexo, Grado, RegistrationDate }) => ({
+                        NIE: NumDocumento, // Mapeo del campo NumDocumento al encabezado "NIE"
                         Nombre,
                         Apellido,
                         Sexo,
