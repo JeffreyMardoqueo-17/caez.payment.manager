@@ -54,7 +54,7 @@ const PadrinoListPage = () => {
         if (selectedPadrino) {
             try {
                 await updatePadrino(selectedPadrino.Id, updatedData);
-                alert("Padrino actualizado exitosamente");
+                // alert("Padrino actualizado exitosamente");
                 fetchPadrinos();
                 setModalType(null); // Cierra el modal de edición
                 setSelectedPadrino(null); // Limpia el padrino seleccionado
@@ -68,7 +68,7 @@ const PadrinoListPage = () => {
         if (selectedPadrino) {
             try {
                 await deletePadrino(selectedPadrino.Id);
-                alert(`Padrino ${selectedPadrino.Nombre} eliminado exitosamente`);
+                // alert(`Padrino ${selectedPadrino.Nombre} eliminado exitosamente`);
                 fetchPadrinos();
                 setModalType(null);
                 setSelectedPadrino(null);
@@ -81,7 +81,7 @@ const PadrinoListPage = () => {
     const closeCreateModal = () => setIsCreateModalOpen(false);
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="mx-auto p-1">
             <h1 className="text-2xl font-bold mb-4">Lista de Padrinos</h1>
 
             <button

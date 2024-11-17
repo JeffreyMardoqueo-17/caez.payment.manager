@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { FaEye, FaEdit, FaTrashAlt, FaSort, FaSearch } from 'react-icons/fa';
+// TableList.tsx (sin cambios necesarios aquí)
 
 interface TableListProps {
     headers: string[];
@@ -9,6 +10,7 @@ interface TableListProps {
     rowsPerPageOptions?: number[];
     initialRowsPerPage?: number;
 }
+
 
 const TableList: React.FC<TableListProps> = ({
     headers,

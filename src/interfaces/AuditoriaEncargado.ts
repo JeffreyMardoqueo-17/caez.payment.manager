@@ -10,6 +10,7 @@ export interface DetallesAuditoria {
     NumDocumento: string;
 }
 
+
 export interface AuditoriaEncargado {
     Id: number;
     FechaHora: string;
