@@ -1,32 +1,50 @@
 "use client";
-import React, { useEffect, useState } from 'react';
-import TableList from '@/components/Tables/TableList';
-import Loader from '@/components/Loader';
-import Modal from '@/components/modals/Modal';
-import DeleteModal from '@/components/modals/DeleteModal';
-import CreateAlumnoForm from '@/components/Alumno/CreateAlumnoForm';
-import EditAlumnoForm from '@/components/Alumno/EditAlumnoForm';
-import MostrarInfo from '@/components/MostrarInfo';
-import { getAlumnos, updateAlumno, deleteAlumno } from '@/services/AlumnoService';
-import { AlumnoGet, AlumnoPost } from '@/interfaces/Alumno';
-import { formatDate } from '@/utils/formatDate';
+
+import React, { useEffect, useState } from "react";
+import TableList from "@/components/Tables/TableList";
+import Loader from "@/components/Loader";
+import Modal from "@/components/modals/Modal";
+import DeleteModal from "@/components/modals/DeleteModal";
+import CreateAlumnoForm from "@/components/Alumno/CreateAlumnoForm";
+import EditAlumnoForm from "@/components/Alumno/EditAlumnoForm";
+import MostrarInfo from "@/components/MostrarInfo";
+import ReportAlumno from "@/components/reports/ReportAlumno"; // Importamos el componente actualizado
+import { getAlumnos, updateAlumno, deleteAlumno } from "@/services/AlumnoService";
+import { AlumnoGet, AlumnoPost } from "@/interfaces/Alumno";
+import { formatDate } from "@/utils/formatDate";
 
 const AlumnoListPage = () => {
     const [alumnos, setAlumnos] = useState<Array<AlumnoGet>>([]);
     const [loading, setLoading] = useState(true);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [selectedAlumno, setSelectedAlumno] = useState<AlumnoGet | null>(null);
-    const [modalType, setModalType] = useState<'view' | 'edit' | 'delete' | null>(null);
+    const [modalType, setModalType] = useState<"view" | "edit" | "delete" | null>(null);
+    const [isPDFModalOpen, setIsPDFModalOpen] = useState(false); // Estado para abrir/cerrar el modal PDF
 
-    const headers = ["NIE", "Nombre", "Apellido", "Sexo", "Grado", "Fecha de Registro"];
+    const headers = [
+        "Id",
+        "Nombre",
+        "Apellido",
+        "FechaNacimiento",
+        "Sexo",
+        "Grado",
+        "Turno",
+        "Encargado", // Combina EncargadoNombre y EncargadoApellido
+        "NumDocumento",
+        "EsBecado",
+        "Nombre del Padrino", // Opcional
+        "Administrador", // Combina AdminName y AdminLastName
+        "Fecha de Registro",
+    ];
 
+    // Función para cargar los alumnos desde el servicio
     const fetchAlumnos = async () => {
         setLoading(true);
         try {
             const data: AlumnoGet[] = await getAlumnos();
             setAlumnos(data);
         } catch (error) {
-            console.error('Error fetching alumnos:', error);
+            console.error("Error fetching alumnos:", error);
         } finally {
             setLoading(false);
         }
@@ -42,28 +60,24 @@ const AlumnoListPage = () => {
             Nombre: alumno.Nombre,
             Apellido: alumno.Apellido,
             FechaNacimiento: alumno.FechaNacimiento,
-            IdSexo: parseInt(alumno.Sexo) || 0, // Conversión para que coincida con el ID de sexo
-            IdRole: 2, // Asignar siempre el rol de estudiante
+            IdSexo: parseInt(alumno.Sexo) || 0,
+            IdRole: 2,
             IdGrado: parseInt(alumno.Grado) || 0,
-            IdTurno: 1, // Asumimos un valor de turno predeterminado, ajusta si es necesario
-            IdEncargado: 1, // Id de un encargado predeterminado, cambia si tienes uno específico
-            IdTipoDocumento: 2, // Tipo de documento predeterminado "NIE"
+            IdTurno: 1,
+            IdEncargado: 1,
+            IdTipoDocumento: 2,
             NumDocumento: alumno.NumDocumento,
             EsBecado: alumno.EsBecado,
-            IdPadrino: alumno.PadrinoNombre ? 1 : null, // Condición para asignar o no un padrino
+            IdPadrino: alumno.PadrinoNombre ? 1 : null,
         };
     };
 
-    const handleActionClick = (row: Record<string, any>, action: 'view' | 'edit' | 'delete') => {
-        console.log("Fila seleccionada:", row, "Acción:", action); // Depuración: Fila seleccionada y acción
-
-        const fullAlumno = alumnos.find(a => a.Id === row.Id);
+    const handleActionClick = (row: Record<string, any>, action: "view" | "edit" | "delete") => {
+        const fullAlumno = alumnos.find((a) => a.Id === row.Id);
         if (!fullAlumno) {
             console.error("No se encontró el alumno con ID:", row.Id);
             return;
         }
-
-        console.log("Alumno encontrado:", fullAlumno); // Depuración: Alumno completo encontrado
         setSelectedAlumno(fullAlumno);
         setModalType(action);
     };
@@ -75,19 +89,17 @@ const AlumnoListPage = () => {
                 ...updatedData,
             };
 
-            console.log('Datos enviados al backend:', completeData); // Depuración
             try {
                 await updateAlumno(selectedAlumno.Id, completeData);
-                alert('Alumno actualizado exitosamente');
+                alert("Alumno actualizado exitosamente");
                 fetchAlumnos();
                 setModalType(null);
                 setSelectedAlumno(null);
             } catch (error) {
-                console.error('Error actualizando el alumno:', error);
+                console.error("Error actualizando el alumno:", error);
             }
         }
     };
-
 
     const handleDeleteAlumno = async () => {
         if (selectedAlumno) {
@@ -110,43 +122,64 @@ const AlumnoListPage = () => {
         <div className="mx-auto p-1">
             <h1 className="text-2xl font-bold mb-4">Lista de Alumnos</h1>
 
-            <button
-                onClick={() => setIsCreateModalOpen(true)}
-                className="mb-4 px-4 py-2 bg-blue-600 text-white rounded"
-            >
-                Crear Nuevo Alumno
-            </button>
+            {/* Botones de acciones principales */}
+            <div className="mb-4 flex space-x-4">
+                <button
+                    onClick={() => setIsCreateModalOpen(true)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded"
+                >
+                    Crear Nuevo Alumno
+                </button>
 
-            <button
-                onClick={fetchAlumnos}
-                className="mb-4 px-4 py-2 ml-4 bg-gray-600 text-white rounded"
-            >
-                Refrescar
-            </button>
+                <button onClick={fetchAlumnos} className="px-4 py-2 bg-gray-600 text-white rounded">
+                    Refrescar
+                </button>
 
+                <button
+                    onClick={() => setIsPDFModalOpen(true)}
+                    className="px-4 py-2 bg-red-600 text-white rounded"
+                >
+                    Generar Reporte PDF
+                </button>
+            </div>
+
+            {/* Loader o Tabla */}
             {loading ? (
                 <Loader />
             ) : (
                 <TableList
-                    headers={headers}
-                    data={alumnos.map(({ Id, NumDocumento, Nombre, Apellido, Sexo, Grado, RegistrationDate }) => ({
-                        Id, // Asegúrate de incluir el ID en los datos para el manejo de acciones
-                        NIE: NumDocumento,
-                        Nombre,
-                        Apellido,
-                        Sexo,
-                        Grado,
-                        "Fecha de Registro": formatDate(RegistrationDate)
-                    }))}
-                    onActionClick={(row, action) => handleActionClick(row, action as 'view' | 'edit' | 'delete')}
+                    headers={["NIE", "Nombre", "Apellido", "Sexo", "Grado", "Fecha de Registro"]}
+                    data={alumnos.map(
+                        ({
+                            Id,
+                            NumDocumento,
+                            Nombre,
+                            Apellido,
+                            Sexo,
+                            Grado,
+                            RegistrationDate,
+                        }) => ({
+                            Id,
+                            NIE: NumDocumento,
+                            Nombre,
+                            Apellido,
+                            Sexo,
+                            Grado,
+                            "Fecha de Registro": formatDate(RegistrationDate),
+                        })
+                    )}
+                    onActionClick={(row, action) =>
+                        handleActionClick(row, action as "view" | "edit" | "delete")
+                    }
                     initialRowsPerPage={10}
                     rowsPerPageOptions={[10, 25, 50, 100]}
                 />
             )}
-            {/* Modal de creación de alumno */}
+
+            {/* Modal para Crear Alumno */}
             <Modal
                 isOpen={isCreateModalOpen}
-                modalId="createAlumnoModal" // Identificador único para este modal
+                modalId="createAlumnoModal"
                 title="Crear Nuevo Alumno"
                 onClose={closeCreateModal}
             >
@@ -158,11 +191,11 @@ const AlumnoListPage = () => {
                 />
             </Modal>
 
-            {/* Modal para ver detalles del alumno */}
-            {selectedAlumno && modalType === 'view' && (
+            {/* Modal para Ver Alumno */}
+            {selectedAlumno && modalType === "view" && (
                 <Modal
                     isOpen={true}
-                    modalId={`viewAlumnoModal-${selectedAlumno.Id}`} // Identificador único para este modal
+                    modalId={`viewAlumnoModal-${selectedAlumno.Id}`}
                     title="Detalles del Alumno"
                     onClose={() => {
                         setSelectedAlumno(null);
@@ -173,11 +206,11 @@ const AlumnoListPage = () => {
                 </Modal>
             )}
 
-            {/* Modal para editar el alumno */}
-            {selectedAlumno && modalType === 'edit' && (
+            {/* Modal para Editar Alumno */}
+            {selectedAlumno && modalType === "edit" && (
                 <Modal
                     isOpen={true}
-                    modalId={`editAlumnoModal-${selectedAlumno.Id}`} // Identificador único para este modal
+                    modalId={`editAlumnoModal-${selectedAlumno.Id}`}
                     title="Editar Alumno"
                     onClose={() => {
                         setSelectedAlumno(null);
@@ -185,7 +218,7 @@ const AlumnoListPage = () => {
                     }}
                 >
                     <EditAlumnoForm
-                        alumnoData={selectedAlumno} // Pasa todo el objeto seleccionado como alumnoData
+                        alumnoData={selectedAlumno}
                         onSaveSuccess={() => {
                             fetchAlumnos();
                             setModalType(null);
@@ -199,9 +232,8 @@ const AlumnoListPage = () => {
                 </Modal>
             )}
 
-
-            {/* Modal de confirmación de eliminación */}
-            {selectedAlumno && modalType === 'delete' && (
+            {/* Modal de Confirmación para Eliminar Alumno */}
+            {selectedAlumno && modalType === "delete" && (
                 <DeleteModal
                     isOpen={true}
                     title="Eliminar Alumno"
@@ -213,6 +245,14 @@ const AlumnoListPage = () => {
                     onConfirm={handleDeleteAlumno}
                 />
             )}
+
+            {/* Modal para Generar Reporte PDF */}
+            <ReportAlumno
+                isOpen={isPDFModalOpen}
+                onClose={() => setIsPDFModalOpen(false)}
+                data={alumnos}
+                defaultHeaders={headers}
+            />
         </div>
     );
 };
