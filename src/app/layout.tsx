@@ -27,10 +27,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased dark:bg-borderDark`}>
         <ClientLayout>
           {children} {/* Renderiza el contenido de la página aquí */}
-        </ClientLayout> 
+        </ClientLayout>
       </body>
     </html>
   );

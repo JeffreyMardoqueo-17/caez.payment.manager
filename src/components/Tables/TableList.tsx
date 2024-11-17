@@ -99,7 +99,7 @@ const TableList: React.FC<TableListProps> = ({
     };
 
     return (
-        <div className="flex flex-col p-1 bg-white rounded-lg shadow-sm ">
+        <div className="flex flex-col p-1 rounded-lg shadow-sm ">
             <div className="flex items-center justify-between mb-4 space-x-2">
                 <button
                     onClick={toggleSortOrder}
@@ -122,13 +122,13 @@ const TableList: React.FC<TableListProps> = ({
             </div>
 
             <div className="overflow-x-auto overflow-y-hidden rounded-t-lg">
-                <table className="min-w-full border-collapse table-fixed shadow-lg">
-                    <thead className="sticky top-0 bg-background">
+                <table className="min-w-full border-collapse table-fixed shadow-lg select-none">
+                    <thead className="sticky top-0 bg-background dark:bg-tableDark">
                         <tr>
                             {headers.map((header, index) => (
                                 <th
                                     key={index}
-                                    className="px-4 py-3 text-left text-sm font-semibold text-gray-800 cursor-pointer"
+                                    className="px-4 py-3 text-left text-sm font-semibold text-gray-800 dark:text-gray-100 cursor-pointer"
                                     onClick={() => handleSort(header, sortConfig?.direction === 'asc' ? 'desc' : 'asc')}
                                 >
                                     {header}
@@ -137,14 +137,14 @@ const TableList: React.FC<TableListProps> = ({
                                     )}
                                 </th>
                             ))}
-                            <th className="px-4 py-3 text-center text-sm font-semibold text-gray-800">Actions</th>
+                            <th className="px-4 py-3 text-center text-sm font-semibold text-gray-800 dark:text-gray-100">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="bg-white">
+                    <tbody className="bg-white dark:bg-tableDark">
                         {paginatedData.map((row, rowIndex) => (
-                            <tr key={rowIndex} className=" hover:bg-hoverTable cursor-pointer">
+                            <tr key={rowIndex} className=" hover:bg-hoverTable cursor-pointer hover:dark:bg-hoverTableDark">
                                 {headers.map((header, colIndex) => (
-                                    <td key={colIndex} className="px-4 py-2 text-sm text-gray-700 whitespace-nowrap">
+                                    <td key={colIndex} className="px-4 py-2 text-sm text-gray-700  dark:text-gray-400 whitespace-nowrap">
                                         {row[header] !== undefined ? row[header] : '-'}
                                     </td>
                                 ))}

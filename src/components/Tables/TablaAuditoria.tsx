@@ -16,13 +16,13 @@ interface TablaAuditoriaProps {
 const getOperationStyle = (operation: string) => {
     switch (operation) {
         case 'INSERT':
-            return "bg-green-100 text-green-800";
+            return "bg-green-100 text-green-800 dark:bg-green-700 dark:text-green-100";
         case 'DELETE':
-            return "bg-red-100 text-red-800";
+            return "bg-red-100 text-red-800 dark:bg-red-700 dark:text-red-100";
         case 'UPDATE':
-            return "bg-orange-100 text-orange-800";
+            return "bg-orange-100 text-orange-800 dark:bg-orange-700 dark:text-orange-100";
         default:
-            return "bg-gray-100 text-gray-800";
+            return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100";
     }
 };
 
@@ -70,7 +70,7 @@ const TablaAuditoria: React.FC<TablaAuditoriaProps> = ({ data, onOpenDetails, on
     };
 
     return (
-        <div className="p-6 bg-white shadow-sm rounded-lg">
+        <div className="p-6 shadow-sm rounded-lg">
             {/* Filtros de fecha */}
             <div className="flex justify-between mb-6">
                 <div className="flex space-x-4">
@@ -128,22 +128,22 @@ const TablaAuditoria: React.FC<TablaAuditoriaProps> = ({ data, onOpenDetails, on
 
             {/* Tabla de auditoría */}
             <table className="min-w-full border-collapse table-fixed rounded-xl select-none">
-                <thead className="bg-background">
+                <thead className="bg-background dark:bg-tableDark">
                     <tr>
                         <th
-                            className="px-4 py-3 text-left text-sm font-semibold text-gray-800 cursor-pointer flex items-center"
+                            className="px-4 py-3 text-left text-sm font-semibold text-gray-800 dark:text-gray-100 cursor-pointer flex items-center"
                             onClick={toggleSortOrder}
                         >
                             Fecha y Hora
                             {isAscending ? <FaSortUp className="ml-1" /> : <FaSortDown className="ml-1" />}
                         </th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-800">Usuario</th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-800">Operación</th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-800">Registro</th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-800">Detalles</th>
+                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-800 dark:text-gray-100">Usuario</th>
+                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-800 dark:text-gray-100">Operación</th>
+                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-800 dark:text-gray-100">Registro</th>
+                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-800 dark:text-gray-100">Detalles</th>
                     </tr>
                 </thead>
-                <tbody className="bg-white">
+                <tbody className="bg-white dark:bg-tableDark">
                     {paginatedData.length === 0 ? (
                         <tr>
                             <td colSpan={5} className="text-center py-4">
@@ -160,20 +160,20 @@ const TablaAuditoria: React.FC<TablaAuditoriaProps> = ({ data, onOpenDetails, on
                         </tr>
                     ) : (
                         paginatedData.map((item) => (
-                            <tr key={item.Id} className="hover:bg-gray-100 cursor-pointer">
-                                <td className="px-4 py-2 text-sm text-gray-700 whitespace-nowrap">
+                            <tr key={item.Id} className="hover:bg-gray-100 hover:dark:bg-hoverTableDark cursor-pointer">
+                                <td className="px-4 py-2 text-sm text-gray-700  dark:text-gray-400 whitespace-nowrap">
                                     {new Date(item.FechaHora).toLocaleString()}
                                 </td>
-                                <td className="px-4 py-2 text-sm text-gray-700 whitespace-nowrap">
+                                <td className="px-4 py-2 text-sm text-gray-700  dark:text-gray-400 whitespace-nowrap">
                                     {item.UsuarioNombre}
                                 </td>
                                 <td className={`px-4 py-2 text-sm font-semibold whitespace-nowrap ${getOperationStyle(item.Operacion)}`}>
                                     {item.Operacion}
                                 </td>
-                                <td className="px-4 py-2 text-sm text-gray-700 whitespace-nowrap">
+                                <td className="px-4 py-2 text-sm text-gray-700  dark:text-gray-400 whitespace-nowrap">
                                     {item.IdRegistro}
                                 </td>
-                                <td className="px-4 py-2 text-sm text-gray-700 whitespace-nowrap">
+                                <td className="px-4 py-2 text-sm text-gray-700  dark:text-gray-400 whitespace-nowrap">
                                     <button
                                         onClick={() => onOpenDetails(item.Detalles)}
                                         className="p-2 bg-blue-100 rounded-full text-bgAzul hover:bg-blue-200 transition duration-200"
