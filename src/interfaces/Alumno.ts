@@ -28,17 +28,17 @@ export interface AlumnoGet {
   Nombre: string;
   Apellido: string;
   FechaNacimiento: string;
-  Sexo: string;
-  RoleName: string;
-  Grado: string;
-  Turno: string;
+  Sexo: string; // Ejemplo: "Masculino"
+  RoleName: string; // Ejemplo: "Estudiante"
+  Grado: string; // Ejemplo: "2° Grado"
+  Turno: string; // Ejemplo: "Mañana"
   EncargadoNombre: string;
   EncargadoApellido: string;
-  TipoDocumento: string;
+  TipoDocumento: string; // Ejemplo: "DUI"
   NumDocumento: string;
   EsBecado: boolean;
-  PadrinoNombre: string | null;
-  PadrinoApellido: string | null;
+  PadrinoNombre?: string | null;
+  PadrinoApellido?: string | null;
   AdminName: string;
   AdminLastName: string;
   RegistrationDate: string;
@@ -64,7 +64,7 @@ export interface AlumnoGet {
 export interface AlumnoPost {
   Nombre: string;
   Apellido: string;
-  FechaNacimiento: string;
+  FechaNacimiento: string; // Formato: "YYYY-MM-DD"
   IdSexo: number;
   IdRole: number;
   IdGrado: number;
@@ -73,5 +73,5 @@ export interface AlumnoPost {
   IdTipoDocumento: number;
   NumDocumento: string;
   EsBecado: boolean;
-  IdPadrino: number | null; //en caso de ser becaso se llena esto, si no se manda como nulo
+  IdPadrino?: number | null; // Opcional si no es becado
 }

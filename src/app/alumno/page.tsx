@@ -55,29 +55,39 @@ const AlumnoListPage = () => {
     };
 
     const handleActionClick = (row: Record<string, any>, action: 'view' | 'edit' | 'delete') => {
+        console.log("Fila seleccionada:", row, "Acción:", action); // Depuración: Fila seleccionada y acción
+
         const fullAlumno = alumnos.find(a => a.Id === row.Id);
         if (!fullAlumno) {
             console.error("No se encontró el alumno con ID:", row.Id);
             return;
         }
 
+        console.log("Alumno encontrado:", fullAlumno); // Depuración: Alumno completo encontrado
         setSelectedAlumno(fullAlumno);
         setModalType(action);
     };
 
     const handleUpdateAlumno = async (updatedData: Partial<AlumnoPost>) => {
         if (selectedAlumno) {
+            const completeData: AlumnoPost = {
+                ...mapAlumnoGetToPost(selectedAlumno),
+                ...updatedData,
+            };
+
+            console.log('Datos enviados al backend:', completeData); // Depuración
             try {
-                await updateAlumno(selectedAlumno.Id, updatedData);
-                alert("Alumno actualizado exitosamente");
+                await updateAlumno(selectedAlumno.Id, completeData);
+                alert('Alumno actualizado exitosamente');
                 fetchAlumnos();
                 setModalType(null);
                 setSelectedAlumno(null);
             } catch (error) {
-                console.error("Error actualizando el alumno:", error);
+                console.error('Error actualizando el alumno:', error);
             }
         }
     };
+
 
     const handleDeleteAlumno = async () => {
         if (selectedAlumno) {
@@ -119,8 +129,9 @@ const AlumnoListPage = () => {
             ) : (
                 <TableList
                     headers={headers}
-                    data={alumnos.map(({ NumDocumento, Nombre, Apellido, Sexo, Grado, RegistrationDate }) => ({
-                        NIE: NumDocumento, // Mapeo del campo NumDocumento al encabezado "NIE"
+                    data={alumnos.map(({ Id, NumDocumento, Nombre, Apellido, Sexo, Grado, RegistrationDate }) => ({
+                        Id, // Asegúrate de incluir el ID en los datos para el manejo de acciones
+                        NIE: NumDocumento,
                         Nombre,
                         Apellido,
                         Sexo,
@@ -171,9 +182,9 @@ const AlumnoListPage = () => {
                         setModalType(null);
                     }}
                 >
+                    {/* Editando el alumno con ID: ${selectedAlumno.Id} */}
                     <EditAlumnoForm
-                        alumnoData={mapAlumnoGetToPost(selectedAlumno)}
-                        alumnoId={selectedAlumno.Id}
+                        alumnoData={selectedAlumno} // Pasa todo el objeto seleccionado como alumnoData
                         onSaveSuccess={() => {
                             fetchAlumnos();
                             setModalType(null);
@@ -186,6 +197,7 @@ const AlumnoListPage = () => {
                     />
                 </Modal>
             )}
+
 
             {/* Modal de confirmación de eliminación */}
             {selectedAlumno && modalType === 'delete' && (

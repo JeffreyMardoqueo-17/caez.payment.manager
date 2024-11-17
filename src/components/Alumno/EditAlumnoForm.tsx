@@ -1,41 +1,63 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { updateAlumno } from '@/services/AlumnoService';
-import { getSexos, Sexo } from '@/services/SexoService';
-import { getGrados, Grado } from '@/services/GradoService';
-import { getTurnos, Turno } from '@/services/TurnoService';
-import { getEncargados } from '@/services/EncargadoService';
-import { getPadrinos } from '@/services/padrinoService';
-import { Encargado } from '@/interfaces/Encargado';
-import { Padrino } from '@/interfaces/Padrino';
-import { AlumnoPost } from '@/interfaces/Alumno';
+
+import React, { useState, useEffect } from "react";
+import { updateAlumno } from "@/services/AlumnoService";
+import { getSexos, Sexo } from "@/services/SexoService";
+import { getGrados, Grado } from "@/services/GradoService";
+import { getTurnos, Turno } from "@/services/TurnoService";
+import { getEncargados } from "@/services/EncargadoService";
+import { getPadrinos } from "@/services/padrinoService";
+import { AlumnoPost, AlumnoGet } from "@/interfaces/Alumno";
+import { Encargado } from "@/interfaces/Encargado";
+import { Padrino } from "@/interfaces/Padrino";
 
 interface EditAlumnoFormProps {
-    alumnoData: AlumnoPost;
-    alumnoId: number;
+    alumnoData: AlumnoGet;
     onSaveSuccess: () => void;
     onCancel: () => void;
 }
 
-const EditAlumnoForm: React.FC<EditAlumnoFormProps> = ({ alumnoData, alumnoId, onSaveSuccess, onCancel }) => {
-    const [formData, setFormData] = useState<AlumnoPost>(alumnoData);
-    const [error, setError] = useState<string | null>(null);
+const EditAlumnoForm: React.FC<EditAlumnoFormProps> = ({
+    alumnoData,
+    onSaveSuccess,
+    onCancel,
+}) => {
+    const [formData, setFormData] = useState<AlumnoPost>({
+        Nombre: alumnoData.Nombre,
+        Apellido: alumnoData.Apellido,
+        FechaNacimiento: alumnoData.FechaNacimiento.split("T")[0],
+        IdSexo: 0,
+        IdRole: 2, // Fijo para "Estudiante"
+        IdGrado: 0,
+        IdTurno: 0,
+        IdEncargado: 0,
+        IdTipoDocumento: 2, // Fijo para "NIE"
+        NumDocumento: alumnoData.NumDocumento,
+        EsBecado: alumnoData.EsBecado,
+        IdPadrino: alumnoData.EsBecado
+            ? null
+            : null, // Valor inicial dependiendo de EsBecado
+    });
+
     const [sexos, setSexos] = useState<Sexo[]>([]);
     const [grados, setGrados] = useState<Grado[]>([]);
     const [turnos, setTurnos] = useState<Turno[]>([]);
     const [encargados, setEncargados] = useState<Encargado[]>([]);
     const [padrinos, setPadrinos] = useState<Padrino[]>([]);
+    const [error, setError] = useState<string | null>(null);
 
+    // Carga inicial de datos externos
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [sexosData, gradosData, turnosData, encargadosData, padrinosData] = await Promise.all([
-                    getSexos(),
-                    getGrados(),
-                    getTurnos(),
-                    getEncargados(),
-                    getPadrinos()
-                ]);
+                const [sexosData, gradosData, turnosData, encargadosData, padrinosData] =
+                    await Promise.all([
+                        getSexos(),
+                        getGrados(),
+                        getTurnos(),
+                        getEncargados(),
+                        getPadrinos(),
+                    ]);
 
                 setSexos(sexosData);
                 setGrados(gradosData);
@@ -43,29 +65,44 @@ const EditAlumnoForm: React.FC<EditAlumnoFormProps> = ({ alumnoData, alumnoId, o
                 setEncargados(encargadosData);
                 setPadrinos(padrinosData);
 
-                // Depuración para verificar que los datos son correctos
-                console.log("Sexos disponibles:", sexosData);
-                console.log("Grados disponibles:", gradosData);
-                console.log("Turnos disponibles:", turnosData);
-                console.log("Encargados disponibles:", encargadosData);
-                console.log("Padrinos disponibles:", padrinosData);
-
+                // Inicializa los IDs basados en los datos actuales
+                setFormData((prevData) => ({
+                    ...prevData,
+                    IdSexo: sexosData.find((s) => s.Nombre === alumnoData.Sexo)?.Id || 0,
+                    IdGrado: gradosData.find((g) => g.Nombre === alumnoData.Grado)?.Id || 0,
+                    IdTurno: turnosData.find((t) => t.Nombre === alumnoData.Turno)?.Id || 0,
+                    IdEncargado:
+                        encargadosData.find(
+                            (e) =>
+                                e.Nombre === alumnoData.EncargadoNombre &&
+                                e.Apellido === alumnoData.EncargadoApellido
+                        )?.Id || 0,
+                    IdPadrino: alumnoData.EsBecado
+                        ? padrinosData.find((p) => p.Nombre === alumnoData.PadrinoNombre)?.Id || null
+                        : null,
+                }));
             } catch (error) {
                 console.error("Error al cargar datos de selectores:", error);
                 setError("Error al cargar datos de los selectores.");
             }
         };
-        fetchData();
-    }, []);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        fetchData();
+    }, [alumnoData]);
+
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    ) => {
         const { name, value, type } = e.target;
-        const fieldValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
+        const fieldValue =
+            type === "checkbox"
+                ? (e.target as HTMLInputElement).checked
+                : value;
 
         setFormData((prevData) => ({
             ...prevData,
             [name]: fieldValue,
-            ...(name === 'EsBecado' && !fieldValue ? { IdPadrino: null } : {}) // Esto borra el IdPadrino si EsBecado es falso
+            ...(name === "EsBecado" && !fieldValue ? { IdPadrino: null } : {}),
         }));
     };
 
@@ -73,17 +110,14 @@ const EditAlumnoForm: React.FC<EditAlumnoFormProps> = ({ alumnoData, alumnoId, o
         e.preventDefault();
         setError(null);
 
-        // Verificar los datos antes de enviarlos
-        console.log("Datos enviados al actualizar:", formData);
-
         try {
-            await updateAlumno(alumnoId, formData);
-            onSaveSuccess(); // Llama a la función para notificar éxito
+            await updateAlumno(alumnoData.Id, formData);
+            onSaveSuccess();
         } catch (error: any) {
+            console.error("Error al actualizar el alumno:", error);
             setError(error.message || "Error al actualizar el alumno");
         }
     };
-
 
     return (
         <form onSubmit={handleSubmit} className="p-4 bg-white rounded-lg max-w-2xl mx-auto">
@@ -188,15 +222,6 @@ const EditAlumnoForm: React.FC<EditAlumnoFormProps> = ({ alumnoData, alumnoId, o
                     </select>
                 </div>
                 <div>
-                    <label className="block text-gray-700">Tipo de Documento</label>
-                    <input
-                        type="text"
-                        value="NIE"
-                        readOnly
-                        className="w-full p-2 border border-gray-300 rounded bg-gray-100 text-gray-500"
-                    />
-                </div>
-                <div>
                     <label className="block text-gray-700">Número de Documento</label>
                     <input
                         type="text"
@@ -208,7 +233,7 @@ const EditAlumnoForm: React.FC<EditAlumnoFormProps> = ({ alumnoData, alumnoId, o
                         required
                     />
                 </div>
-                <div className="col-span-3">
+                <div>
                     <label className="block text-gray-700">Becado</label>
                     <input
                         type="checkbox"
@@ -219,7 +244,7 @@ const EditAlumnoForm: React.FC<EditAlumnoFormProps> = ({ alumnoData, alumnoId, o
                     />
                 </div>
                 {formData.EsBecado && (
-                    <div className="col-span-3">
+                    <div>
                         <label className="block text-gray-700">Padrino</label>
                         <select
                             name="IdPadrino"
@@ -242,10 +267,17 @@ const EditAlumnoForm: React.FC<EditAlumnoFormProps> = ({ alumnoData, alumnoId, o
             {error && <p className="text-red-500 mt-4">{error}</p>}
 
             <div className="flex justify-center gap-4 mt-6">
-                <button type="button" onClick={onCancel} className="bg-gray-500 text-white py-2 px-4 rounded-lg">
+                <button
+                    type="button"
+                    onClick={onCancel}
+                    className="bg-gray-500 text-white py-2 px-4 rounded-lg"
+                >
                     Cancelar
                 </button>
-                <button type="submit" className="bg-blue-600 text-white py-2 px-4 rounded-lg">
+                <button
+                    type="submit"
+                    className="bg-blue-600 text-white py-2 px-4 rounded-lg"
+                >
                     Guardar Cambios
                 </button>
             </div>

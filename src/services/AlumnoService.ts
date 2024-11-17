@@ -17,7 +17,7 @@ export const getAlumnos = async (): Promise<AlumnoGet[]> => {
 // Servicio para obtener un alumno por su ID
 export const getAlumnoById = async (id: number): Promise<AlumnoGet> => {
     const response = await axios.get(`${API_URL}/alumnos/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
 };
@@ -48,40 +48,29 @@ export const createAlumno = async (alumnoData: AlumnoPost): Promise<void> => {
     }
 }
 
-// Servicio para actualizar un alumno
-export const updateAlumno = async (id: number, alumnoData: Partial<AlumnoPost>): Promise<void> => {
+export const updateAlumno = async (id: number, data: AlumnoPost): Promise<void> => {
     try {
-        await axios.put(`${API_URL}/alumnos/${id}`, alumnoData, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
+        await axios.put(`${API_URL}/alumnos/${id}`, data, {
+            headers: { Authorization: `Bearer ${token}` },
         });
     } catch (error: any) {
-        if (error.response && error.response.status === 400) {
-            throw new Error(error.response.data.msg || "Error desconocido al actualizar el alumno");
-        } else {
-            throw new Error("Error al conectar con el servidor");
-        }
+        console.error('Error en el servicio de actualización:', error.response?.data || error.message);
+        throw new Error(error.response?.data || 'Error al actualizar el alumno');
     }
 };
-// Servicio para eliminar un alumno
 export const deleteAlumno = async (id: number): Promise<void> => {
-    const token = Cookies.get('token');
     if (!token) {
         throw new Error("No se encontró el token de autenticación");
     }
 
     try {
         await axios.delete(`${API_URL}/alumnos/${id}`, {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` },
         });
     } catch (error: any) {
         if (error.response) {
-            console.error('Error en la respuesta del servidor:', error.response.data);
-            throw new Error(error.response.data.msg || "Error desconocido al eliminar el alumno");
+            throw new Error(error.response.data.msg || "Error al eliminar el alumno");
         } else {
-            console.error('Error de conexión:', error.message);
             throw new Error("Error al conectar con el servidor");
         }
     }
