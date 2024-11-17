@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+:root{
+    --bagroundLigth: "#f3f4f6";
+    --bagroundDark: "#0a0d1e";
+}
+html{
+    background-color: var(--bagroundLigth);
+}
+.dark html{
+    background-color: var(--bagroundDark);
+}
+
+.dark body{
+    background-color: var(--bagroundDark);
+}

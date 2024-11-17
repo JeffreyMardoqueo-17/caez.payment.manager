@@ -143,10 +143,10 @@ const AlumnoListPage = () => {
                     rowsPerPageOptions={[10, 25, 50, 100]}
                 />
             )}
-
             {/* Modal de creación de alumno */}
             <Modal
                 isOpen={isCreateModalOpen}
+                modalId="createAlumnoModal" // Identificador único para este modal
                 title="Crear Nuevo Alumno"
                 onClose={closeCreateModal}
             >
@@ -162,6 +162,7 @@ const AlumnoListPage = () => {
             {selectedAlumno && modalType === 'view' && (
                 <Modal
                     isOpen={true}
+                    modalId={`viewAlumnoModal-${selectedAlumno.Id}`} // Identificador único para este modal
                     title="Detalles del Alumno"
                     onClose={() => {
                         setSelectedAlumno(null);
@@ -176,13 +177,13 @@ const AlumnoListPage = () => {
             {selectedAlumno && modalType === 'edit' && (
                 <Modal
                     isOpen={true}
+                    modalId={`editAlumnoModal-${selectedAlumno.Id}`} // Identificador único para este modal
                     title="Editar Alumno"
                     onClose={() => {
                         setSelectedAlumno(null);
                         setModalType(null);
                     }}
                 >
-                    {/* Editando el alumno con ID: ${selectedAlumno.Id} */}
                     <EditAlumnoForm
                         alumnoData={selectedAlumno} // Pasa todo el objeto seleccionado como alumnoData
                         onSaveSuccess={() => {

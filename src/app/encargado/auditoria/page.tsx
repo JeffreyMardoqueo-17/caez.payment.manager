@@ -11,10 +11,10 @@ import Loader from '@/components/Loader';
 
 const AuditoriaEncargadoList: React.FC = () => {
     const [auditoria, setAuditoria] = useState<AuditoriaEncargado[]>([]);
-    const [startDate, setStartDate] = useState<string>('');
-    const [endDate, setEndDate] = useState<string>('');
+    const [startDate] = useState<string>('');
+    const [endDate] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
+    const [setError] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [selectedDetails, setSelectedDetails] = useState<string | DetallesAuditoria | { Antiguo: DetallesAuditoria; Nuevo: DetallesAuditoria } | null>(null);
 
@@ -29,7 +29,7 @@ const AuditoriaEncargadoList: React.FC = () => {
             setAuditoria(data);
             setError(null);
         } catch (error) {
-            setError("Error al cargar los registros de auditoría.");
+            setError("Error al cargar los registros de auditoría." + error);
         } finally {
             setLoading(false);
         }
@@ -118,11 +118,11 @@ const AuditoriaEncargadoList: React.FC = () => {
             {loading ? (
                 <Loader />
             ) : (
-                <TablaAuditoria 
-                    data={auditoria} 
-                    onOpenDetails={openModal} 
-                    onFilterByDate={handleFilterByDate} 
-                    onFetchAll={fetchAllAuditoria} 
+                <TablaAuditoria
+                    data={auditoria}
+                    onOpenDetails={openModal}
+                    onFilterByDate={handleFilterByDate}
+                    onFetchAll={fetchAllAuditoria}
                 />
             )}
 
