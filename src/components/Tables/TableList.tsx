@@ -109,14 +109,14 @@ const TableList: React.FC<TableListProps> = ({
                     <span>{sortConfig?.direction === 'asc' ? 'Orden Descendente' : 'Orden Ascendente'}</span>
                 </button>
 
-                <div className="flex items-center bg-gray-100 rounded-lg px-2">
+                <div className="flex items-center bg-gray-100 dark:bg-tableDark rounded-lg px-4 w-2/3">
                     <FaSearch className="text-gray-500 mr-2" />
                     <input
                         type="text"
                         value={searchQuery}
                         onChange={handleSearch}
                         placeholder="Buscar..."
-                        className="bg-gray-100 text-gray-800 focus:outline-none px-2 py-1 rounded-lg"
+                        className="bg-gray-100 dark:bg-tableDark dark:text-gray-200 text-gray-800 focus:outline-none px-2 py-1 rounded-lg"
                     />
                 </div>
             </div>
@@ -128,7 +128,7 @@ const TableList: React.FC<TableListProps> = ({
                             {headers.map((header, index) => (
                                 <th
                                     key={index}
-                                    className="px-4 py-3 text-left text-sm font-semibold text-gray-800 dark:text-gray-100 cursor-pointer"
+                                    className="px-4 py-3 text-left text-base font-semibold text-gray-800 dark:text-gray-100 cursor-pointer"
                                     onClick={() => handleSort(header, sortConfig?.direction === 'asc' ? 'desc' : 'asc')}
                                 >
                                     {header}
@@ -144,7 +144,7 @@ const TableList: React.FC<TableListProps> = ({
                         {paginatedData.map((row, rowIndex) => (
                             <tr key={rowIndex} className=" hover:bg-hoverTable cursor-pointer hover:dark:bg-hoverTableDark">
                                 {headers.map((header, colIndex) => (
-                                    <td key={colIndex} className="px-4 py-2 text-sm text-gray-700  dark:text-gray-400 whitespace-nowrap">
+                                    <td key={colIndex} className="px-4 py-2 text-base text-gray-700  dark:text-gray-400 whitespace-nowrap">
                                         {row[header] !== undefined ? row[header] : '-'}
                                     </td>
                                 ))}

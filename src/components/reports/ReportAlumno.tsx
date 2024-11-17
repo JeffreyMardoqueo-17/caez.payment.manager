@@ -170,7 +170,7 @@ const ReportAlumno: React.FC<PDFReportModalProps> = ({ isOpen, onClose, data }) 
         );
 
         const isHorizontal = selectedHeaders.length > 6;
-        generatePDF(finalData, selectedHeaders, "Reporte Personalizado");
+        generatePDF(finalData, selectedHeaders, "Reporte Personalizado", isHorizontal ? "landscape" : "portrait");
         onClose();
     };
 
@@ -180,16 +180,20 @@ const ReportAlumno: React.FC<PDFReportModalProps> = ({ isOpen, onClose, data }) 
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-4xl">
-                <h2 className="text-lg font-bold mb-4">Generar Reporte PDF</h2>
+            <div className="bg-white dark:bg-bagroundDark rounded-lg p-6 w-full max-w-4xl">
+                <h2 className="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">
+                    Generar Reporte PDF
+                </h2>
                 {/* Filtros */}
                 <div className="flex flex-wrap gap-4 mb-4">
                     <div className="flex flex-col w-full md:w-1/3">
-                        <label className="text-sm font-medium mb-2">Tipo de Reporte</label>
+                        <label className="text-sm font-medium mb-2 text-gray-900 dark:text-gray-100">
+                            Tipo de Reporte
+                        </label>
                         <select
                             value={filterType}
                             onChange={(e) => setFilterType(e.target.value)}
-                            className="p-2 border rounded"
+                            className="p-2 border dark:border-borderDark rounded bg-white dark:bg-borderDark dark:text-gray-100"
                         >
                             <option value="all">Todos los registros</option>
                             <option value="becados">Solo Becados</option>
@@ -203,7 +207,7 @@ const ReportAlumno: React.FC<PDFReportModalProps> = ({ isOpen, onClose, data }) 
                     {/* Filtro específico */}
                     {["grado", "turno", "sexo", "administrador"].includes(filterType) && (
                         <div className="flex flex-col w-full md:w-1/3">
-                            <label className="text-sm font-medium mb-2">
+                            <label className="text-sm font-medium mb-2 text-gray-900 dark:text-gray-100">
                                 {filterType === "grado"
                                     ? "Selecciona un Grado"
                                     : filterType === "turno"
@@ -215,7 +219,7 @@ const ReportAlumno: React.FC<PDFReportModalProps> = ({ isOpen, onClose, data }) 
                             <select
                                 value={selectedFilter}
                                 onChange={(e) => setSelectedFilter(e.target.value)}
-                                className="p-2 border rounded"
+                                className="p-2 border border-borderDark rounded bg-white dark:bg-borderDark dark:text-gray-100"
                             >
                                 <option value="">-- Seleccionar --</option>
                                 {(filterType === "grado"
@@ -245,10 +249,12 @@ const ReportAlumno: React.FC<PDFReportModalProps> = ({ isOpen, onClose, data }) 
                 </div>
                 {/* Columnas */}
                 <div className="mb-4">
-                    <label className="text-sm font-medium mb-2">Selecciona columnas</label>
+                    <label className="text-sm font-medium mb-2 text-gray-900 dark:text-gray-100">
+                        Selecciona columnas
+                    </label>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                         {allHeaders.map((header) => (
-                            <label key={header} className="flex items-center">
+                            <label key={header} className="flex items-center text-gray-900 dark:text-gray-100">
                                 <input
                                     type="checkbox"
                                     checked={selectedHeaders.includes(header)}
@@ -262,21 +268,21 @@ const ReportAlumno: React.FC<PDFReportModalProps> = ({ isOpen, onClose, data }) 
                 </div>
                 {/* Tabla */}
                 <div className="mb-4">
-                    <h3 className="text-sm font-medium mb-2">Previsualización</h3>
-                    <div className="overflow-x-auto border">
+                    <h3 className="text-sm font-medium mb-2 text-gray-900 dark:text-gray-100">Previsualización</h3>
+                    <div className="overflow-x-auto border dark:border-borderDark rounded bg-white dark:bg-gray-700">
                         <table className="min-w-full text-sm">
-                            <thead>
+                            <thead className="bg-background dark:bg-tableDark">
                                 <tr>
                                     {selectedHeaders.map((header) => (
-                                        <th key={header} className="p-2 font-semibold bg-gray-200">
+                                        <th key={header} className="p-2 font-semibold text-gray-800 dark:text-gray-100 ">
                                             {header}
                                         </th>
                                     ))}
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className="bg-white dark:bg-borderDark">
                                 {processedData.map((row, index) => (
-                                    <tr key={index} className="odd:bg-white even:bg-gray-50">
+                                    <tr key={index} className="bg-white dark:bg-tableDark text-gray-700  dark:text-gray-400 whitespace-nowrap">
                                         {selectedHeaders.map((header) => (
                                             <td key={header} className="p-2">
                                                 {row[header] || "N/A"}
@@ -292,7 +298,7 @@ const ReportAlumno: React.FC<PDFReportModalProps> = ({ isOpen, onClose, data }) 
                 <div className="flex justify-end space-x-2">
                     <button
                         onClick={onClose}
-                        className="flex items-center px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                        className="flex items-center px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600"
                     >
                         <FaTimes className="mr-2" />
                         Cancelar
