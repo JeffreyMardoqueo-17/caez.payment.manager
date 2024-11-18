@@ -37,7 +37,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, title, onClose, children }) => {
         >
             <div
                 ref={modalRef}
-                className="bg-white w-full max-w-3xl mx-auto rounded-lg shadow-lg overflow-hidden" // max-w-3xl para ancho mayor
+                className="bg-background dark:bg-bagroundDark w-full max-w-3xl mx-auto rounded-lg shadow-lg overflow-hidden" // max-w-3xl para ancho mayor
             >
                 <div className="bg-bgAzul px-6 py-4 flex items-center justify-between">
                     <h2 className="text-lg font-semibold text-white">{title}</h2>

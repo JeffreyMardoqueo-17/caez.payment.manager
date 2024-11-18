@@ -108,50 +108,50 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
     };
 
     return (
-        <form onSubmit={handleSubmit} className="p-4 bg-white rounded-lg max-w-2xl mx-auto">
+        <form onSubmit={handleSubmit} className="p-4 bg-white dark:bg-bagroundDark rounded-lg max-w-2xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                    <label className="block text-gray-700">Nombre</label>
+                    <label className="block text-gray-700 dark:text-gray-200">Nombre</label>
                     <input
                         type="text"
                         name="Nombre"
                         value={alumnoData.Nombre}
                         onChange={handleChange}
                         placeholder="Nombre"
-                        className="w-full p-2 border border-gray-300 rounded"
+                        className="w-full p-2  border-gray-300 rounded bg-white dark:bg-borderDark dark:border-gray-600 dark:text-gray-200"
                         required
                     />
                 </div>
                 <div>
-                    <label className="block text-gray-700">Apellido</label>
+                    <label className="block text-gray-700 dark:text-gray-200">Apellido</label>
                     <input
                         type="text"
                         name="Apellido"
                         value={alumnoData.Apellido}
                         onChange={handleChange}
                         placeholder="Apellido"
-                        className="w-full p-2 border border-gray-300 rounded"
+                        className="w-full p-2  border-gray-300 rounded bg-white dark:bg-borderDark dark:border-gray-600 dark:text-gray-200"
                         required
                     />
                 </div>
                 <div>
-                    <label className="block text-gray-700">Fecha de Nacimiento</label>
+                    <label className="block text-gray-700 dark:text-gray-200">Fecha de Nacimiento</label>
                     <input
                         type="date"
                         name="FechaNacimiento"
                         value={alumnoData.FechaNacimiento}
                         onChange={handleChange}
-                        className="w-full p-2 border border-gray-300 rounded"
+                        className="w-full p-2  border-gray-300 rounded bg-white dark:bg-borderDark dark:border-gray-600 dark:text-gray-200"
                         required
                     />
                 </div>
                 <div>
-                    <label className="block text-gray-700">Sexo</label>
+                    <label className="block text-gray-700 dark:text-gray-200">Sexo</label>
                     <select
                         name="IdSexo"
                         value={alumnoData.IdSexo}
                         onChange={handleChange}
-                        className="w-full p-2 border border-gray-300 rounded"
+                        className="w-full p-2  border-gray-300 rounded bg-white dark:bg-borderDark dark:border-gray-600 dark:text-gray-200"
                         required
                     >
                         {sexos.map((sexo) => (
@@ -162,12 +162,12 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
                     </select>
                 </div>
                 <div>
-                    <label className="block text-gray-700">Grado</label>
+                    <label className="block text-gray-700 dark:text-gray-200">Grado</label>
                     <select
                         name="IdGrado"
                         value={alumnoData.IdGrado}
                         onChange={handleChange}
-                        className="w-full p-2 border border-gray-300 rounded"
+                        className="w-full p-2  border-gray-300 rounded bg-white dark:bg-borderDark dark:border-gray-600 dark:text-gray-200"
                         required
                     >
                         {grados.map((grado) => (
@@ -178,12 +178,12 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
                     </select>
                 </div>
                 <div>
-                    <label className="block text-gray-700">Turno</label>
+                    <label className="block text-gray-700 dark:text-gray-200">Turno</label>
                     <select
                         name="IdTurno"
                         value={alumnoData.IdTurno}
                         onChange={handleChange}
-                        className="w-full p-2 border border-gray-300 rounded"
+                        className="w-full p-2  border-gray-300 rounded bg-white dark:bg-borderDark dark:border-gray-600 dark:text-gray-200"
                         required
                     >
                         {turnos.map((turno) => (
@@ -194,12 +194,12 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
                     </select>
                 </div>
                 <div>
-                    <label className="block text-gray-700">Encargado</label>
+                    <label className="block text-gray-700 dark:text-gray-200">Encargado</label>
                     <select
                         name="IdEncargado"
                         value={alumnoData.IdEncargado}
                         onChange={handleChange}
-                        className="w-full p-2 border border-gray-300 rounded"
+                        className="w-full p-2  border-gray-300 rounded bg-white dark:bg-borderDark dark:border-gray-600 dark:text-gray-200"
                         required
                     >
                         {encargados.map((encargado) => (
@@ -210,28 +210,28 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
                     </select>
                 </div>
                 <div>
-                    <label className="block text-gray-700">Tipo de Documento</label>
+                    <label className="block text-gray-700 dark:text-gray-200">Tipo de Documento</label>
                     <input
                         type="text"
                         value="NIE"
                         readOnly
-                        className="w-full p-2 border border-gray-300 rounded bg-gray-100 text-gray-500"
+                        className="w-full p-2 border border-grarounded bg-gray-100 text-gray-500 dark:bg-borderDark dark:text-gray-400"
                     />
                 </div>
                 <div>
-                    <label className="block text-gray-700">Número de Documento</label>
+                    <label className="block text-gray-700 dark:text-gray-200">Número de Documento</label>
                     <input
                         type="text"
                         name="NumDocumento"
                         value={alumnoData.NumDocumento}
                         onChange={handleChange}
                         placeholder="Número de Documento"
-                        className="w-full p-2 border border-gray-300 rounded"
+                        className="w-full p-2  border-gray-300 rounded bg-white dark:bg-borderDark dark:border-gray-600 dark:text-gray-200"
                         required
                     />
                 </div>
                 <div className="col-span-3">
-                    <label className="block text-gray-700">Becado</label>
+                    <label className="block text-gray-700 dark:text-gray-200">Becado</label>
                     <input
                         type="checkbox"
                         name="EsBecado"
@@ -242,12 +242,12 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
                 </div>
                 {alumnoData.EsBecado && (
                     <div className="col-span-3">
-                        <label className="block text-gray-700">Padrino</label>
+                        <label className="block text-gray-700 dark:text-gray-200">Padrino</label>
                         <select
                             name="IdPadrino"
                             value={alumnoData.IdPadrino ?? ""}
                             onChange={handleChange}
-                            className="w-full p-2 border border-gray-300 rounded"
+                            className="w-full p-2  border-gray-300 rounded bg-white dark:bg-borderDark dark:border-gray-600 dark:text-gray-200"
                             required
                         >
                             <option value="">Seleccione un Padrino</option>
@@ -261,15 +261,17 @@ const CreateAlumnoForm: React.FC<CreateAlumnoFormProps> = ({ onCreateSuccess }) 
                 )}
             </div>
 
-            {error && <p className="text-red-500 mt-4">{error}</p>}
+            {error && <p className="text-red-500 dark:text-red-400 mt-4">{error}</p>}
 
             <div className="flex justify-center">
-                <button type="submit" className="flex items-center justify-center w-2/3 gap-2 bg-bgAzul text-white py-2 rounded-lg mt-6 ">
-                    <FaUserPlus className="text-lg" /> {/* Ajusta el tamaño del ícono si es necesario */}
+                <button
+                    type="submit"
+                    className="flex items-center justify-center w-2/3 gap-2 bg-bgAzul dark:bg-bgAmarillo text-white dark:text-black py-2 rounded-lg mt-6"
+                >
+                    <FaUserPlus className="text-lg" />
                     <span>Crear Alumno</span>
                 </button>
             </div>
-
         </form>
     );
 };

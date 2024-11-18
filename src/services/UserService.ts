@@ -1,6 +1,5 @@
 import axios from "axios";
 import Cookies from "js-cookie";
-import { User } from "@/interfaces/User";
 
 const API_URL = "http://localhost:9000";
 
