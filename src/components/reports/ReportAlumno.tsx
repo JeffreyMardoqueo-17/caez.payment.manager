@@ -8,6 +8,7 @@ import { Turno, getTurnos } from "@/services/TurnoService";
 import { Sexo, getSexos } from "@/services/SexoService";
 import { User, getUsers } from "@/services/UserService";
 import { FaFilePdf, FaTimes } from "react-icons/fa"; // Íconos de React Icons
+import Cookies from "js-cookie";
 
 /**
  * Formatea una fecha a `dd/mm/yyyy hh:mm`.
@@ -44,6 +45,8 @@ const ReportAlumno: React.FC<PDFReportModalProps> = ({ isOpen, onClose, data }) 
         "EsBecado",
         "Fecha de Registro",
     ]);
+    const [description, setDescription] = useState<string>(""); // Campo para capturar la descripción
+    const [adminName, setAdminName] = useState<string>(""); // Nombre del administrador logueado
 
     const [grados, setGrados] = useState<Grado[]>([]);
     const [turnos, setTurnos] = useState<Turno[]>([]);
@@ -66,7 +69,6 @@ const ReportAlumno: React.FC<PDFReportModalProps> = ({ isOpen, onClose, data }) 
         "Fecha de Registro",
     ];
 
-    // Cargar datos dinámicos al montar el componente
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -81,6 +83,12 @@ const ReportAlumno: React.FC<PDFReportModalProps> = ({ isOpen, onClose, data }) 
                 setTurnos(turnosData);
                 setSexos(sexosData);
                 setAdministradores(usersData.filter((user) => user.RoleName === "Administrador"));
+
+                const storedUser = Cookies.get("user");
+                if (storedUser) {
+                    const user = JSON.parse(decodeURIComponent(storedUser));
+                    setAdminName(`${user.name} ${user.lastName}`);
+                }
             } catch (error) {
                 console.error("Error al cargar datos:", error);
             }
@@ -89,7 +97,6 @@ const ReportAlumno: React.FC<PDFReportModalProps> = ({ isOpen, onClose, data }) 
         fetchData();
     }, []);
 
-    // Filtrar datos según tipo de reporte
     useEffect(() => {
         let filtered: AlumnoGet[] = data;
 
@@ -170,30 +177,58 @@ const ReportAlumno: React.FC<PDFReportModalProps> = ({ isOpen, onClose, data }) 
         );
 
         const isHorizontal = selectedHeaders.length > 6;
-        generatePDF(finalData, selectedHeaders, "Reporte Personalizado", isHorizontal ? "landscape" : "portrait");
+
+        generatePDF(
+            finalData,
+            selectedHeaders,
+            {
+                title: "Informe de Alumnado",
+                reportType:
+                    filterType === "all"
+                        ? "Todos los registros"
+                        : filterType === "becados"
+                            ? "Solo Becados"
+                            : filterType === "noBecados"
+                                ? "No Becados"
+                                : `Por ${filterType}`,
+                date: new Date().toLocaleDateString(),
+                adminName,
+                description,
+            },
+            isHorizontal ? "landscape" : "portrait"
+        );
+
+        setDescription(""); // Limpia el campo de descripción
         onClose();
     };
 
     if (!isOpen) return null;
 
+
     const processedData = processDataForDisplay();
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white dark:bg-bagroundDark rounded-lg p-6 w-full max-w-4xl">
-                <h2 className="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">
-                    Generar Reporte PDF
-                </h2>
+            <div className="bg-background dark:bg-tableDark rounded-lg p-6 w-full max-w-4xl">
+                <h2 className="text-lg font-bold mb-4">Generar Reporte PDF</h2>
+                {/* Campo de descripción */}
+                <div className="mb-4">
+                    <label className="text-sm font-medium mb-2">Descripción del informe</label>
+                    <textarea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Describe el propósito del informe..."
+                        className="p-2 border rounded w-full dark:bg-borderDark dark:border-borderDark"
+                    />
+                </div>
                 {/* Filtros */}
                 <div className="flex flex-wrap gap-4 mb-4">
                     <div className="flex flex-col w-full md:w-1/3">
-                        <label className="text-sm font-medium mb-2 text-gray-900 dark:text-gray-100">
-                            Tipo de Reporte
-                        </label>
+                        <label className="text-sm font-medium mb-2">Tipo de Reporte</label>
                         <select
                             value={filterType}
                             onChange={(e) => setFilterType(e.target.value)}
-                            className="p-2 border dark:border-borderDark rounded bg-white dark:bg-borderDark dark:text-gray-100"
+                            className="p-2 dark:bg-borderDark rounded cursor-pointer border dark:border-borderDark"
                         >
                             <option value="all">Todos los registros</option>
                             <option value="becados">Solo Becados</option>
@@ -207,7 +242,7 @@ const ReportAlumno: React.FC<PDFReportModalProps> = ({ isOpen, onClose, data }) 
                     {/* Filtro específico */}
                     {["grado", "turno", "sexo", "administrador"].includes(filterType) && (
                         <div className="flex flex-col w-full md:w-1/3">
-                            <label className="text-sm font-medium mb-2 text-gray-900 dark:text-gray-100">
+                            <label className="text-sm font-medium mb-2">
                                 {filterType === "grado"
                                     ? "Selecciona un Grado"
                                     : filterType === "turno"
@@ -219,7 +254,7 @@ const ReportAlumno: React.FC<PDFReportModalProps> = ({ isOpen, onClose, data }) 
                             <select
                                 value={selectedFilter}
                                 onChange={(e) => setSelectedFilter(e.target.value)}
-                                className="p-2 border border-borderDark rounded bg-white dark:bg-borderDark dark:text-gray-100"
+                                className="p-2 border rounded dark:bg-borderDark cursor-pointer"
                             >
                                 <option value="">-- Seleccionar --</option>
                                 {(filterType === "grado"
@@ -249,12 +284,10 @@ const ReportAlumno: React.FC<PDFReportModalProps> = ({ isOpen, onClose, data }) 
                 </div>
                 {/* Columnas */}
                 <div className="mb-4">
-                    <label className="text-sm font-medium mb-2 text-gray-900 dark:text-gray-100">
-                        Selecciona columnas
-                    </label>
+                    <label className="text-sm font-medium mb-2">Selecciona columnas</label>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                         {allHeaders.map((header) => (
-                            <label key={header} className="flex items-center text-gray-900 dark:text-gray-100">
+                            <label key={header} className="flex items-center">
                                 <input
                                     type="checkbox"
                                     checked={selectedHeaders.includes(header)}
@@ -268,21 +301,21 @@ const ReportAlumno: React.FC<PDFReportModalProps> = ({ isOpen, onClose, data }) 
                 </div>
                 {/* Tabla */}
                 <div className="mb-4">
-                    <h3 className="text-sm font-medium mb-2 text-gray-900 dark:text-gray-100">Previsualización</h3>
-                    <div className="overflow-x-auto border dark:border-borderDark rounded bg-white dark:bg-gray-700">
+                    <h3 className="text-sm font-medium mb-2">Previsualización</h3>
+                    <div className="overflow-x-auto border dark:border-borderDark rounded-xl ">
                         <table className="min-w-full text-sm">
-                            <thead className="bg-background dark:bg-tableDark">
+                            <thead className="bg-background dark:bg-borderDark">
                                 <tr>
                                     {selectedHeaders.map((header) => (
-                                        <th key={header} className="p-2 font-semibold text-gray-800 dark:text-gray-100 ">
+                                        <th key={header} className="p-2 font-semibold text-gray-800 dark:text-gray-100">
                                             {header}
                                         </th>
                                     ))}
                                 </tr>
                             </thead>
-                            <tbody className="bg-white dark:bg-borderDark">
+                            <tbody className="bg-white dark:bg-bagroundDark">
                                 {processedData.map((row, index) => (
-                                    <tr key={index} className="bg-white dark:bg-tableDark text-gray-700  dark:text-gray-400 whitespace-nowrap">
+                                    <tr key={index} className="hover:bg-hoverTable cursor-pointer hover:dark:bg-hoverTableDark">
                                         {selectedHeaders.map((header) => (
                                             <td key={header} className="p-2">
                                                 {row[header] || "N/A"}
@@ -298,7 +331,7 @@ const ReportAlumno: React.FC<PDFReportModalProps> = ({ isOpen, onClose, data }) 
                 <div className="flex justify-end space-x-2">
                     <button
                         onClick={onClose}
-                        className="flex items-center px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600"
+                        className="flex items-center px-4 py-2 text-gray-100 bg-red-600 rounded hover:bg-red-700"
                     >
                         <FaTimes className="mr-2" />
                         Cancelar
